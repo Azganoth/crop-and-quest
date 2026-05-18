@@ -1,0 +1,7 @@
+{
+  "sortTailwindcss": {
+    "stylesheet": "./src/app/globals.css",
+    "functions": ["cva", "cn"]
+  },
+  "ignorePatterns": []
+}

@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Crop & Quest
 
-## Getting Started
+A local-first, browser-based portrait cropper and exporter for RPGs and CRPGs.
 
-First, run the development server:
+Crop & Quest helps players turn any image into game-ready portrait files with the correct dimensions, aspect ratios, and filenames for supported games.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Images are processed locally in the browser for cropping and export.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Upload an image from your device
+- Crop, zoom, and position portraits for specific game sizes
+- Export individual portrait files
+- Export all portrait variants as a ZIP
+- Use game-specific portrait presets
+- View per-game portrait requirements and notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentation
 
-## Learn More
+- [Project specification](./DOCS.md)
+- [Contributing guide](./CONTRIBUTING.md)
 
-To learn more about Next.js, take a look at the following resources:
+## Legal Notice
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Crop & Quest is an unofficial fan-made tool. It is not affiliated with, endorsed by, or sponsored by any game publisher, studio, or rights holder. Game names, trademarks, and related assets belong to their respective owners.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the [MIT](./LICENSE).
