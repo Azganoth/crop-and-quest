@@ -40,7 +40,7 @@ flowchart TD
 
 3. **Review**
    - User sees each generated variant with preview, dimensions, filename, edit action, and export action.
-   - ZIP Export is disabled if any `required: true` variants are uncropped.
+   - ZIP Export is disabled if any non-optional variants are uncropped.
    - The UI must include a "Start Over" action to clear the session and return to image selection.
 
 4. **Export**
@@ -61,7 +61,7 @@ flowchart TD
 /support                  Donation and support information
 ```
 
-Editor routes share one portrait session through the editor layout. If a user visits a crop or review route without an image, redirect to that game's select step. Users navigate between variants sequentially, but must complete all `required` variants to unlock global export.
+Editor routes share one portrait session through the editor layout. If a user visits a crop or review route without an image, redirect to that game's select step. Users navigate between variants sequentially, but must complete all non-optional variants to unlock global export.
 
 ### Error Scenarios & UX
 
@@ -144,6 +144,7 @@ export interface GamePreset {
   id: string;
   name: string;
   description?: string;
+  coverImageUrl?: string;
   variants: PortraitVariant[];
   installNotes?: string;
   sourceUrl?: string;
@@ -157,7 +158,7 @@ export interface PortraitVariant {
   format: "png" | "jpeg" | "webp" | "bmp" | "tga";
   quality?: number; // 0.0 to 1.0 for lossy formats
   filename: string;
-  required?: boolean;
+  optional?: boolean;
 }
 ```
 
@@ -175,7 +176,6 @@ export const pathfinderKingmakerPreset: GamePreset = {
       height: 1024,
       format: "png",
       filename: "Fulllength.png",
-      required: true,
     },
     {
       key: "medium",
@@ -184,7 +184,6 @@ export const pathfinderKingmakerPreset: GamePreset = {
       height: 432,
       format: "png",
       filename: "Medium.png",
-      required: true,
     },
     {
       key: "small",
@@ -193,7 +192,6 @@ export const pathfinderKingmakerPreset: GamePreset = {
       height: 242,
       format: "png",
       filename: "Small.png",
-      required: true,
     },
   ],
 };
