@@ -3,6 +3,8 @@
     "*.css": "tailwindcss"
   },
   "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "oxc.path.oxfmt": "node_modules/.bin/oxfmt",
+  "oxc.path.oxlint": "node_modules/.bin/oxlint",
 
   "[javascript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
@@ -23,6 +25,9 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[markdown]": {
