@@ -5,6 +5,7 @@ export interface CropState {
   y: number;
   zoom: number;
   rotation: number;
+  croppedBlobUrl?: string;
   croppedAreaPixels?: {
     x: number;
     y: number;
@@ -21,7 +22,6 @@ export interface PortraitSession {
   imageUrl: string | null;
   crops: Partial<CropStateMap>;
 
-  // Actions
   setGameId: (id: string) => void;
   setImage: (file: File) => void;
   setCrop: (variantKey: string, crop: CropState) => void;
@@ -38,15 +38,12 @@ export const usePortraitStore = create<PortraitSession>((set, get) => ({
 
   setImage: (file) => {
     const currentUrl = get().imageUrl;
-    // Revoke previous object URL to prevent memory leaks
     if (currentUrl) {
       URL.revokeObjectURL(currentUrl);
     }
 
-    // Create new object URL for the uploaded file
     const newUrl = URL.createObjectURL(file);
 
-    // Reset crops when a new image is uploaded
     set({
       imageFile: file,
       imageUrl: newUrl,
@@ -55,18 +52,30 @@ export const usePortraitStore = create<PortraitSession>((set, get) => ({
   },
 
   setCrop: (variantKey, crop) =>
-    set((state) => ({
-      crops: {
-        ...state.crops,
-        [variantKey]: crop,
-      },
-    })),
+    set((state) => {
+      const previousCrop = state.crops[variantKey];
+      if (previousCrop?.croppedBlobUrl) {
+        URL.revokeObjectURL(previousCrop.croppedBlobUrl);
+      }
+      return {
+        crops: {
+          ...state.crops,
+          [variantKey]: crop,
+        },
+      };
+    }),
 
   clearSession: () => {
-    const currentUrl = get().imageUrl;
-    if (currentUrl) {
-      URL.revokeObjectURL(currentUrl);
+    const state = get();
+    if (state.imageUrl) {
+      URL.revokeObjectURL(state.imageUrl);
     }
+    Object.values(state.crops).forEach((crop) => {
+      if (crop?.croppedBlobUrl) {
+        URL.revokeObjectURL(crop.croppedBlobUrl);
+      }
+    });
+
     set({
       gameId: "",
       imageFile: null,
