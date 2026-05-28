@@ -27,7 +27,7 @@ export default async function EditorLayout({
           <div className="absolute inset-0 bg-linear-to-b from-background/60 via-background/80 to-background" />
         </div>
       )}
-      <div className="relative z-0 w-full flex-1">{children}</div>
+      <div className="relative z-0 flex w-full flex-1 flex-col">{children}</div>
     </div>
   );
 }
