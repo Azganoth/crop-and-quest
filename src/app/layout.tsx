@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Lora, Cinzel, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-const fontLora = Lora({
-  variable: "--font-lora",
-  subsets: ["latin"],
-});
-
-const fontCinzel = Cinzel({
-  variable: "--font-cinzel",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
@@ -38,7 +33,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${fontLora.variable} ${fontCinzel.variable} ${fontMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${fontMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
         <ThemeProvider
