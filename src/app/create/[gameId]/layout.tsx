@@ -1,3 +1,4 @@
+import { SessionProtector } from "@/components/SessionProtector";
 import { GAMES } from "@/data/games";
 import Image from "next/image";
 import { ReactNode } from "react";
@@ -14,6 +15,7 @@ export default async function EditorLayout({
 
   return (
     <div className="relative flex flex-1 flex-col">
+      <SessionProtector />
       {game && (
         <div className="pointer-events-none fixed inset-0 z-[-1] overflow-hidden">
           <Image
