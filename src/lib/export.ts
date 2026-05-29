@@ -22,14 +22,23 @@ export async function generateGameZip(
       if (!response.ok) throw new Error("Failed to fetch blob");
       const blob = await response.blob();
 
-      zip.file(variant.filename, blob);
+      // Sanitize filename to prevent path traversal
+      const safeFilename = variant.filename.replace(/[^a-zA-Z0-9.\-_]/g, "");
+      zip.file(safeFilename, blob);
     } catch (e) {
       console.error(`Failed to fetch blob for ${variant.key}:`, e);
       throw new Error(`Failed to process variant: ${variant.label}`);
     }
   }
 
-  return await zip.generateAsync({ type: "blob" });
+  try {
+    return await zip.generateAsync({ type: "blob" });
+  } catch (e) {
+    console.error("ZIP Generation failed:", e);
+    throw new Error(
+      "OOM: Failed to generate ZIP. The files might be too large for browser memory. Please use the individual download buttons below.",
+    );
+  }
 }
 
 export function triggerDownload(blobOrUrl: Blob | string, filename: string) {

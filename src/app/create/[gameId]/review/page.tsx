@@ -64,9 +64,11 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
       document.body.removeChild(a);
     } catch (error) {
       console.error(error);
-      alert(
-        "Failed to generate ZIP file. If your device ran out of memory, please download the individual files below instead.",
-      );
+      const msg =
+        error instanceof Error
+          ? error.message
+          : "Failed to generate ZIP file. Please download individual files instead.";
+      alert(msg);
     } finally {
       setIsExporting(false);
     }
