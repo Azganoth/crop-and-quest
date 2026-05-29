@@ -16,76 +16,7 @@ export function createImage(url: string): Promise<HTMLImageElement> {
 export function getRadianAngle(degreeValue: number): number {
   return (degreeValue * Math.PI) / 180;
 }
-
-function encodeBMP(imageData: ImageData): Blob {
-  const { width, height, data } = imageData;
-  const rowSize = Math.floor((width * 24 + 31) / 32) * 4;
-  const pixelDataSize = rowSize * height;
-  const fileSize = 54 + pixelDataSize;
-
-  const buffer = new ArrayBuffer(fileSize);
-  const view = new DataView(buffer);
-
-  view.setUint8(0, 0x42);
-  view.setUint8(1, 0x4d);
-  view.setUint32(2, fileSize, true);
-  view.setUint16(6, 0, true);
-  view.setUint16(8, 0, true);
-  view.setUint32(10, 54, true);
-
-  view.setUint32(14, 40, true);
-  view.setInt32(18, width, true);
-  view.setInt32(22, height, true);
-  view.setUint16(26, 1, true);
-  view.setUint16(28, 24, true);
-  view.setUint32(30, 0, true);
-  view.setUint32(34, pixelDataSize, true);
-  view.setInt32(38, 0, true);
-  view.setInt32(42, 0, true);
-  view.setUint32(46, 0, true);
-  view.setUint32(50, 0, true);
-
-  let offset = 54;
-  for (let y = height - 1; y >= 0; y--) {
-    let rowOffset = offset;
-    for (let x = 0; x < width; x++) {
-      const srcOffset = (y * width + x) * 4;
-      view.setUint8(rowOffset, data[srcOffset + 2]);
-      view.setUint8(rowOffset + 1, data[srcOffset + 1]);
-      view.setUint8(rowOffset + 2, data[srcOffset]);
-      rowOffset += 3;
-    }
-    offset += rowSize;
-  }
-
-  return new Blob([buffer], { type: "image/bmp" });
-}
-
-function encodeTGA(imageData: ImageData): Blob {
-  const { width, height, data } = imageData;
-  const pixelDataSize = width * height * 3;
-  const buffer = new ArrayBuffer(18 + pixelDataSize);
-  const view = new DataView(buffer);
-
-  view.setUint8(2, 2);
-  view.setUint16(12, width, true);
-  view.setUint16(14, height, true);
-  view.setUint8(16, 24);
-
-  let offset = 18;
-  for (let y = height - 1; y >= 0; y--) {
-    for (let x = 0; x < width; x++) {
-      const srcOffset = (y * width + x) * 4;
-      view.setUint8(offset, data[srcOffset + 2]);
-      view.setUint8(offset + 1, data[srcOffset + 1]);
-      view.setUint8(offset + 2, data[srcOffset]);
-      offset += 3;
-    }
-  }
-
-  return new Blob([buffer], { type: "image/tga" });
-}
-
+import { encodeBMP, encodeTGA } from "./encoders";
 export async function getCroppedImg(
   imageSrc: string,
   pixelCrop: { x: number; y: number; width: number; height: number },
