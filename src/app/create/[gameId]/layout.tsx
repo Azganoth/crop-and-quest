@@ -1,4 +1,4 @@
-import { SessionProtector } from "@/components/SessionProtector";
+import { SessionProtector } from "@/features/generator/components/SessionProtector";
 import { GAMES } from "@/data/games";
 import Image from "next/image";
 import { ReactNode } from "react";

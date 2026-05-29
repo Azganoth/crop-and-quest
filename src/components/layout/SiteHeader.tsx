@@ -1,7 +1,7 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { Crop } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

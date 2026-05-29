@@ -1,7 +1,7 @@
 "use client";
 
 import { GAMES } from "@/data/games";
-import { usePortraitStore } from "@/store/usePortraitStore";
+import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
 import { Image as ImageIcon, UploadCloud } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useRef, useState } from "react";
@@ -32,15 +32,16 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
     }
 
     const validTypes = ["image/png", "image/jpeg", "image/webp"];
-    
-    // Explicit HEIC check
+
     if (
       file.type === "image/heic" ||
       file.type === "image/heif" ||
       file.name.toLowerCase().endsWith(".heic") ||
       file.name.toLowerCase().endsWith(".heif")
     ) {
-      setError("HEIC/HEIF format from iPhones is not supported in browser. Please convert to JPEG or PNG first.");
+      setError(
+        "HEIC/HEIF format from iPhones is not supported in browser. Please convert to JPEG or PNG first.",
+      );
       return;
     }
 
@@ -49,11 +50,9 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
       return;
     }
 
-    // Save to store
     setGameId(gameId);
     setImage(file);
 
-    // Navigate to first variant
     if (game && game.variants.length > 0) {
       const firstVariant = game.variants[0].key;
       router.push(`/create/${gameId}/${firstVariant}`);
@@ -62,11 +61,12 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    
-    // Explicitly reject cross-origin URLs dragged from other tabs
+
     const uri = e.dataTransfer.getData("text/uri-list");
     if (uri && e.dataTransfer.files.length === 0) {
-      setError("Cross-origin image links are not supported to prevent security errors. Please save the image to your device and upload the local file.");
+      setError(
+        "Cross-origin image links are not supported to prevent security errors. Please save the image to your device and upload the local file.",
+      );
       return;
     }
 
@@ -75,7 +75,7 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
       setError("Please drop a valid image file.");
       return;
     }
-    
+
     handleFile(file);
   };
 

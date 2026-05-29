@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePortraitStore } from "@/store/usePortraitStore";
 
-export function useBeforeUnload() {
-  const imageFile = usePortraitStore((s) => s.imageFile);
-
+export function useBeforeUnload(shouldPrevent: boolean) {
   useEffect(() => {
-    if (!imageFile) return;
+    if (!shouldPrevent) return;
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
@@ -19,5 +16,5 @@ export function useBeforeUnload() {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [imageFile]);
+  }, [shouldPrevent]);
 }

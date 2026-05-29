@@ -1,4 +1,4 @@
-export function createImage(url: string): Promise<HTMLImageElement> {
+export function loadImageFromUrl(url: string): Promise<HTMLImageElement> {
   const { promise, resolve, reject } = Promise.withResolvers<HTMLImageElement>();
 
   const image = new Image();
@@ -13,11 +13,11 @@ export function createImage(url: string): Promise<HTMLImageElement> {
   return promise;
 }
 
-export function getRadianAngle(degreeValue: number): number {
+export function degreesToRadians(degreeValue: number): number {
   return (degreeValue * Math.PI) / 180;
 }
 import { encodeBMP, encodeTGA } from "./encoders";
-export async function getCroppedImg(
+export async function exportCroppedImage(
   imageSrc: string,
   pixelCrop: { x: number; y: number; width: number; height: number },
   rotation = 0,
@@ -26,14 +26,14 @@ export async function getCroppedImg(
   format: "png" | "jpeg" | "webp" | "bmp" | "tga" = "png",
   quality = 1.0,
 ): Promise<string> {
-  const image = await createImage(imageSrc);
+  const image = await loadImageFromUrl(imageSrc);
 
   const bBoxWidth =
-    Math.abs(Math.cos(getRadianAngle(rotation)) * image.width) +
-    Math.abs(Math.sin(getRadianAngle(rotation)) * image.height);
+    Math.abs(Math.cos(degreesToRadians(rotation)) * image.width) +
+    Math.abs(Math.sin(degreesToRadians(rotation)) * image.height);
   const bBoxHeight =
-    Math.abs(Math.sin(getRadianAngle(rotation)) * image.width) +
-    Math.abs(Math.cos(getRadianAngle(rotation)) * image.height);
+    Math.abs(Math.sin(degreesToRadians(rotation)) * image.width) +
+    Math.abs(Math.cos(degreesToRadians(rotation)) * image.height);
 
   const interCanvas = document.createElement("canvas");
   interCanvas.width = bBoxWidth;
@@ -42,7 +42,7 @@ export async function getCroppedImg(
   if (!interCtx) throw new Error("Failed to get intermediate canvas context");
 
   interCtx.translate(bBoxWidth / 2, bBoxHeight / 2);
-  interCtx.rotate(getRadianAngle(rotation));
+  interCtx.rotate(degreesToRadians(rotation));
   interCtx.translate(-image.width / 2, -image.height / 2);
   interCtx.drawImage(image, 0, 0);
 

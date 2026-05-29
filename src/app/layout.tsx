@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import { Lora, Cinzel, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { ThemeProvider } from "@/components/theme-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { TooltipProvider } from "@/components/ui/Tooltip";
+import type { Metadata } from "next";
+import { Cinzel, Geist_Mono, Lora } from "next/font/google";
+import "./globals.css";
 
 const fontLora = Lora({
   variable: "--font-lora",
