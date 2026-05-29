@@ -53,8 +53,6 @@ flowchart TD
 
 ```txt
 /                         Home
-/games                    Supported games
-/games/[gameId]           Game preset details
 /create/[gameId]/select   Select source image
 /create/[gameId]/[variant] Crop a specific portrait variant
 /create/[gameId]/review   Review and export
@@ -143,8 +141,7 @@ Game presets define dimensions, aspect ratios, filenames, and game-specific note
 export interface GamePreset {
   id: string;
   name: string;
-  description?: string;
-  coverImageUrl?: string;
+  cover: StaticImageData;
   variants: PortraitVariant[];
   installNotes?: string;
   sourceUrl?: string;
