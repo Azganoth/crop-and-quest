@@ -84,38 +84,33 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         <div className="flex items-center gap-4">
           <Button variant="outline" size="icon" className="shrink-0" asChild>
             <Link href={`/create/${gameId}/select`} aria-label="Go back">
-              <ArrowLeft className="size-4" />
+              <ArrowLeft className="size-6" />
             </Link>
           </Button>
           <div>
             <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
               Review Portraits
             </h1>
-            <p className="text-sm text-muted-foreground md:text-base">{game.name}</p>
+            <p className="text-muted-foreground md:text-base">{game.name}</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-5">
           <Button variant="outline" onClick={handleStartOver}>
-            <RefreshCw className="mr-2 size-4" />
+            <RefreshCw className="mr-1 size-5" />
             Start Over
           </Button>
-          <Button
-            onClick={handleDownloadZip}
-            disabled={isExporting || isMissingRequired}
-            size="lg"
-            variant={zipBlobUrl ? "default" : "default"}
-          >
+          <Button onClick={handleDownloadZip} disabled={isExporting || isMissingRequired} size="lg">
             {isExporting ? (
               "Packaging..."
             ) : zipBlobUrl ? (
               <>
-                <FileArchive className="mr-2 size-5" />
+                <FileArchive className="mr-1 size-5" />
                 Download ZIP Again
               </>
             ) : (
               <>
-                <FileArchive className="mr-2 size-5" />
+                <FileArchive className="mr-1 size-5" />
                 Download All (ZIP)
               </>
             )}
@@ -131,9 +126,11 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
       )}
 
       <div className="flex flex-wrap items-start justify-center gap-6">
-        {game.variants.map((variant) => (
-          <PortraitPreviewCard key={variant.key} variant={variant} crop={crops[variant.key]} />
-        ))}
+        {game.variants
+          .toSorted((a, b) => a.height - b.height)
+          .map((variant) => (
+            <PortraitPreviewCard key={variant.key} variant={variant} crop={crops[variant.key]} />
+          ))}
       </div>
     </div>
   );

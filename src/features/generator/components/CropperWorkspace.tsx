@@ -104,6 +104,7 @@ export function CropperWorkspace({
   if (!imageUrl) return null;
 
   const aspect = variant.width / variant.height;
+  const canSkip = variant.optional && !isProcessing;
 
   return (
     <div className="relative flex flex-1 flex-col md:flex-row">
@@ -127,7 +128,7 @@ export function CropperWorkspace({
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" className="shrink-0" asChild>
               <Link href={`/create/${game.id}/select`} aria-label="Go back">
-                <ArrowLeft className="size-4" />
+                <ArrowLeft className="size-6" />
               </Link>
             </Button>
             <div>
@@ -157,7 +158,7 @@ export function CropperWorkspace({
             variant="secondary"
             size="lg"
             onClick={handleSkip}
-            disabled={isProcessing || !variant.optional}
+            disabled={!canSkip}
             className="w-full text-base"
           >
             Skip Variant

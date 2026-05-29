@@ -1,6 +1,6 @@
-import Link from "next/link";
-import Image from "next/image";
 import { GAMES } from "@/data/games";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -22,19 +22,18 @@ export default function Home() {
             <Link
               key={game.id}
               href={`/create/${game.id}/select`}
-              className="group relative flex flex-col items-center justify-start overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:border-primary/50 hover:shadow-md"
+              className="group relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-muted shadow-sm transition-all hover:border-primary/50 hover:shadow-lg"
             >
-              <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden border-b border-border/50 bg-muted">
-                <Image
-                  src={game.cover}
-                  alt={`${game.name} cover`}
-                  fill
-                  placeholder="blur"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </div>
-              <div className="flex flex-1 items-center p-6">
-                <h3 className="text-center font-semibold transition-colors group-hover:text-primary">
+              <Image
+                src={game.cover}
+                alt={`${game.name} cover`}
+                fill
+                placeholder="blur"
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/50 transition-colors duration-500 group-hover:bg-black/70" />
+              <div className="relative z-10 p-6 text-center">
+                <h3 className="font-display text-2xl font-bold tracking-tight text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
                   {game.name}
                 </h3>
               </div>

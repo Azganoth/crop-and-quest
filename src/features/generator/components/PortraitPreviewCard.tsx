@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/Button";
 import type { PortraitVariant } from "@/data/games";
 import type { CropState } from "@/features/generator/store/usePortraitStore";
 import { triggerDownload } from "@/features/generator/utils/export";
+import { cn } from "@/lib/cn";
 import { Download } from "lucide-react";
 import Image from "next/image";
 
@@ -12,13 +13,13 @@ interface PortraitPreviewCardProps {
 
 export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps) {
   const hasCrop = !!crop?.croppedBlobUrl;
-  const isSmall = variant.width < 280;
 
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all ${
-        !hasCrop && !variant.optional ? "border-destructive/50" : "border-border/50"
-      } w-fit max-w-full min-w-70`}
+      className={cn(
+        "flex w-fit max-w-full min-w-70 flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all",
+        !hasCrop && !variant.optional ? "border-destructive/50" : "border-border/50",
+      )}
     >
       <div
         className="group relative flex w-full items-center justify-center overflow-hidden bg-black/10"
@@ -27,7 +28,7 @@ export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps)
         }}
       >
         <div className="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]" />
-        {hasCrop && isSmall && (
+        {hasCrop && (
           <>
             <div
               className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
@@ -44,19 +45,21 @@ export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps)
             width={variant.width}
             height={variant.height}
             unoptimized
-            className={`relative z-10 transition-transform duration-300 hover:scale-105 ${
-              isSmall ? "shadow-2xl ring-1 ring-white/10" : "max-h-full max-w-full object-contain"
-            }`}
-            style={{
-              width: `${variant.width}px`,
-              height: `${variant.height}px`,
-            }}
+            className="relative z-10 shadow-2xl ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-(--hover-scale)"
+            style={
+              {
+                width: `${variant.width}px`,
+                height: `${variant.height}px`,
+                "--hover-scale": 1 + 15 / variant.width,
+              } as React.CSSProperties
+            }
           />
         ) : (
           <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
             <span className="text-sm font-semibold">Not generated</span>
-            {variant.optional && <span className="mt-1 text-xs opacity-75">(Optional)</span>}
-            {!variant.optional && (
+            {variant.optional ? (
+              <span className="mt-1 text-xs opacity-75">(Optional)</span>
+            ) : (
               <span className="mt-1 text-xs font-medium text-destructive">(Required)</span>
             )}
           </div>
@@ -65,24 +68,21 @@ export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps)
 
       <div className="flex flex-col gap-3 border-t border-border/50 p-4">
         <div className="flex items-start justify-between gap-2">
-          <div>
-            <h3 className="font-display text-base font-semibold text-primary">{variant.label}</h3>
-            <p className="mt-1 font-mono text-xs text-muted-foreground">{variant.filename}</p>
-          </div>
-          <span className="shrink-0 rounded bg-secondary px-1.5 py-0.5 font-mono text-xs font-medium text-secondary-foreground">
+          <h3 className="font-display text-lg font-semibold text-primary">{variant.label}</h3>
+          <span className="shrink-0 rounded bg-secondary px-1.5 py-1 font-mono text-sm font-medium text-secondary-foreground">
             {variant.width}×{variant.height}px
           </span>
         </div>
 
         {hasCrop && (
           <Button
-            size="sm"
             variant="outline"
+            size="lg"
             className="mt-1 w-full"
             onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
           >
-            <Download className="mr-2 size-4" />
-            Download Portrait
+            <Download className="mr-1 size-5" />
+            {variant.filename}
           </Button>
         )}
       </div>

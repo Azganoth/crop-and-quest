@@ -25,7 +25,7 @@ export function RotationControl({ rotation, onRotationChange }: RotationControlP
               className="shrink-0"
               onClick={() => onRotationChange(rotation - 5)}
             >
-              <RotateCcw className="size-4" />
+              <RotateCcw className="size-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Rotate Left (-5°)</TooltipContent>
@@ -47,7 +47,7 @@ export function RotationControl({ rotation, onRotationChange }: RotationControlP
               className="shrink-0"
               onClick={() => onRotationChange(rotation + 5)}
             >
-              <RotateCw className="size-4" />
+              <RotateCw className="size-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Rotate Right (+5°)</TooltipContent>

@@ -25,7 +25,7 @@ export function ZoomControl({ zoom, onZoomChange }: ZoomControlProps) {
               className="shrink-0"
               onClick={() => onZoomChange(Math.max(1, zoom - 0.1))}
             >
-              <ZoomOut className="size-4" />
+              <ZoomOut className="size-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Zoom Out (-10%)</TooltipContent>
@@ -47,7 +47,7 @@ export function ZoomControl({ zoom, onZoomChange }: ZoomControlProps) {
               className="shrink-0"
               onClick={() => onZoomChange(Math.min(3, zoom + 0.1))}
             >
-              <ZoomIn className="size-4" />
+              <ZoomIn className="size-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Zoom In (+10%)</TooltipContent>
