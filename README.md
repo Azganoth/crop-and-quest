@@ -15,11 +15,6 @@ Images are processed locally in the browser for cropping and export.
 - Use game-specific portrait presets
 - View per-game portrait requirements and notes
 
-## Documentation
-
-- [Project specification](./DOCS.md)
-- [Contributing guide](./CONTRIBUTING.md)
-
 ## Legal Notice
 
 Crop & Quest is an unofficial fan-made tool. It is not affiliated with, endorsed by, or sponsored by any game publisher, studio, or rights holder. Game names, trademarks, and related assets belong to their respective owners.
