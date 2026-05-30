@@ -5,8 +5,7 @@ import { GAMES } from "@/data/games";
 import { PortraitPreviewCard } from "@/features/generator/components/PortraitPreviewCard";
 import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
 import { generateGameZip } from "@/features/generator/utils/export";
-import { ArrowLeft, FileArchive, RefreshCw } from "lucide-react";
-import Link from "next/link";
+import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
@@ -24,6 +23,14 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
       router.replace("/");
     }
   }, [game, router]);
+
+  // Invalidate cached zip when crops change
+  useEffect(() => {
+    if (zipBlobUrl) {
+      URL.revokeObjectURL(zipBlobUrl);
+      setZipBlobUrl(null);
+    }
+  }, [crops, zipBlobUrl]);
 
   // Revoking the object URL on unmount prevents memory leaks from untracked blob references.
   useEffect(() => {
@@ -75,18 +82,13 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
 
   const handleStartOver = () => {
     clearSession();
-    router.push("/");
+    router.push(`/create/${gameId}/select`);
   };
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 md:p-8">
       <div className="flex flex-col gap-4 border-b border-border/50 pb-6 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" className="shrink-0" asChild>
-            <Link href={`/create/${gameId}/select`} aria-label="Go back">
-              <ArrowLeft className="size-6" />
-            </Link>
-          </Button>
           <div>
             <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
               Review Portraits
@@ -103,15 +105,10 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
           <Button onClick={handleDownloadZip} disabled={isExporting || isMissingRequired} size="lg">
             {isExporting ? (
               "Packaging..."
-            ) : zipBlobUrl ? (
-              <>
-                <FileArchive className="mr-1 size-5" />
-                Download ZIP Again
-              </>
             ) : (
               <>
                 <FileArchive className="mr-1 size-5" />
-                Download All (ZIP)
+                Download All
               </>
             )}
           </Button>
@@ -121,7 +118,8 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
       {isMissingRequired && (
         <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
           <strong>Cannot create ZIP:</strong> You must crop all non-optional portraits before
-          generating a ZIP archive. Please go back and complete the missing variants.
+          generating a ZIP archive. Please click the Edit icon on the missing variants to complete
+          them.
         </div>
       )}
 

@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/Button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import type { PortraitVariant } from "@/data/games";
 import type { CropState } from "@/features/generator/store/usePortraitStore";
 import { triggerDownload } from "@/features/generator/utils/export";
 import { cn } from "@/lib/cn";
-import { Download } from "lucide-react";
+import { Download, Edit2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 interface PortraitPreviewCardProps {
   variant: PortraitVariant;
@@ -13,6 +16,7 @@ interface PortraitPreviewCardProps {
 
 export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps) {
   const hasCrop = !!crop?.croppedBlobUrl;
+  const params = useParams<{ gameId: string }>();
 
   return (
     <div
@@ -56,11 +60,11 @@ export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps)
           />
         ) : (
           <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
-            <span className="text-sm font-semibold">Not generated</span>
+            <span className="font-semibold">Not cropped</span>
             {variant.optional ? (
-              <span className="mt-1 text-xs opacity-75">(Optional)</span>
+              <span className="mt-1 opacity-75">(Optional)</span>
             ) : (
-              <span className="mt-1 text-xs font-medium text-destructive">(Required)</span>
+              <span className="mt-1 font-medium text-destructive">(Required)</span>
             )}
           </div>
         )}
@@ -75,15 +79,37 @@ export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps)
         </div>
 
         {hasCrop && (
-          <Button
-            variant="outline"
-            size="lg"
-            className="mt-1 w-full"
-            onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
-          >
-            <Download className="mr-1 size-5" />
-            {variant.filename}
-          </Button>
+          <div className="mt-1 flex gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon-lg" asChild>
+                  <Link href={`/create/${params?.gameId}/${variant.key}?singleEdit=true`}>
+                    <Edit2 className="size-5" />
+                    <span className="sr-only">Edit variant</span>
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit variant</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="flex-1"
+                  onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
+                >
+                  <Download className="mr-1 size-5 shrink-0" />
+                  <span className="truncate">{variant.filename}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Download {variant.filename}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         )}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
 import { exportCroppedImage } from "@/lib/canvas";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cropper, { Area, Point } from "react-easy-crop";
 import { RotationControl } from "./RotationControl";
@@ -30,6 +30,8 @@ export function CropperWorkspace({
   variantKey,
 }: CropperWorkspaceProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isSingleEdit = searchParams.get("singleEdit") === "true";
   const { imageUrl, crops, setCrop } = usePortraitStore();
 
   const [crop, setCropState] = useState<Point>({ x: 0, y: 0 });
@@ -80,7 +82,9 @@ export function CropperWorkspace({
         croppedBlobUrl,
       });
 
-      if (nextVariant) {
+      if (isSingleEdit) {
+        router.push(`/create/${game.id}/review`);
+      } else if (nextVariant) {
         router.push(`/create/${game.id}/${nextVariant.key}`);
       } else {
         router.push(`/create/${game.id}/review`);
@@ -94,7 +98,9 @@ export function CropperWorkspace({
   };
 
   const handleSkip = () => {
-    if (nextVariant) {
+    if (isSingleEdit) {
+      router.push(`/create/${game.id}/review`);
+    } else if (nextVariant) {
       router.push(`/create/${game.id}/${nextVariant.key}`);
     } else {
       router.push(`/create/${game.id}/review`);
@@ -104,7 +110,12 @@ export function CropperWorkspace({
   if (!imageUrl) return null;
 
   const aspect = variant.width / variant.height;
-  const canSkip = variant.optional && !isProcessing;
+  const previousVariant = variantIndex > 0 ? game.variants[variantIndex - 1] : undefined;
+  const backHref = isSingleEdit
+    ? `/create/${game.id}/review`
+    : previousVariant
+      ? `/create/${game.id}/${previousVariant.key}`
+      : `/create/${game.id}/select`;
 
   return (
     <div className="relative flex flex-1 flex-col md:flex-row">
@@ -127,7 +138,7 @@ export function CropperWorkspace({
         <div className="flex flex-col gap-4 border-b border-border/50 p-6">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" className="shrink-0" asChild>
-              <Link href={`/create/${game.id}/select`} aria-label="Go back">
+              <Link href={backHref} aria-label="Go back">
                 <ArrowLeft className="size-6" />
               </Link>
             </Button>
@@ -152,17 +163,31 @@ export function CropperWorkspace({
             size="lg"
             className="w-full text-base"
           >
-            {isProcessing ? "Processing..." : "Save & Next"}
+            {isProcessing ? "Processing..." : isSingleEdit ? "Save" : "Save & Next"}
           </Button>
-          <Button
-            variant="secondary"
-            size="lg"
-            onClick={handleSkip}
-            disabled={!canSkip}
-            className="w-full text-base"
-          >
-            Skip Variant
-          </Button>
+          {isSingleEdit ? (
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={handleSkip}
+              disabled={isProcessing}
+              className="w-full text-base"
+            >
+              Cancel Edit
+            </Button>
+          ) : (
+            variant.optional && (
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={handleSkip}
+                disabled={isProcessing}
+                className="w-full text-base"
+              >
+                Skip Variant
+              </Button>
+            )
+          )}
         </div>
       </div>
     </div>
