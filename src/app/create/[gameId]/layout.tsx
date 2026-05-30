@@ -22,6 +22,7 @@ export default async function EditorLayout({
             src={game.cover}
             alt="Background cover"
             fill
+            sizes="100vw"
             className="object-cover opacity-20 mix-blend-overlay blur-sm"
             placeholder="blur"
           />
