@@ -1,4 +1,10 @@
 import { Button } from "@/components/ui/Button";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/InputGroup";
 import { Label } from "@/components/ui/Label";
 import { Slider } from "@/components/ui/Slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
@@ -12,9 +18,27 @@ interface RotationControlProps {
 export function RotationControl({ rotation, onRotationChange }: RotationControlProps) {
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between gap-2 px-1">
         <Label>Rotation</Label>
-        <span className="text-sm font-medium text-muted-foreground">{rotation}°</span>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" onClick={() => onRotationChange(0)}>
+            Reset
+          </Button>
+          <InputGroup>
+            <InputGroupInput
+              type="number"
+              value={rotation}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                if (!isNaN(val)) onRotationChange(Math.max(-180, Math.min(180, val)));
+              }}
+              className="max-w-20"
+            />
+            <InputGroupAddon align="inline-end">
+              <InputGroupText>°</InputGroupText>
+            </InputGroupAddon>
+          </InputGroup>
+        </div>
       </div>
       <div className="flex items-center gap-3">
         <Tooltip>

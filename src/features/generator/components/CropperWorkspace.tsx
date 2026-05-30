@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Cropper, { Area, Point } from "react-easy-crop";
 import { RotationControl } from "./RotationControl";
-import { ZoomControl } from "./ZoomControl";
+import { MAX_ZOOM, ZoomControl } from "./ZoomControl";
 
 interface CropperWorkspaceProps {
   game: GamePreset;
@@ -40,6 +40,9 @@ export function CropperWorkspace({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [imageResolution, setImageResolution] = useState<{ width: number; height: number } | null>(
+    null,
+  );
 
   useEffect(() => {
     if (crops[variantKey]) {
@@ -53,8 +56,30 @@ export function CropperWorkspace({
   useEffect(() => {
     if (!imageUrl) {
       router.replace(`/create/${game.id}/select`);
+      return;
     }
+
+    let isMounted = true;
+    const img = new Image();
+    img.onload = () => {
+      if (isMounted) {
+        setImageResolution({ width: img.naturalWidth, height: img.naturalHeight });
+      }
+    };
+    img.src = imageUrl;
+
+    return () => {
+      isMounted = false;
+    };
   }, [imageUrl, game.id, router]);
+
+  const handleZoom1to1 = () => {
+    if (croppedAreaPixels) {
+      const baseCropWidth = croppedAreaPixels.width * zoom;
+      const targetZoom = baseCropWidth / variant.width;
+      setZoom(Math.max(1, targetZoom));
+    }
+  };
 
   const handleCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
@@ -137,10 +162,35 @@ export function CropperWorkspace({
           onRotationChange={setRotation}
           showGrid={true}
           zoomSpeed={0.2}
+          maxZoom={MAX_ZOOM}
         />
       </div>
       <div className="z-20 flex w-full flex-col border-l border-border/50 bg-card/80 backdrop-blur md:w-80 md:shrink-0 lg:w-96">
-        <div className="flex flex-col gap-4 border-b border-border/50 p-6">
+        <div className="flex flex-col gap-6 border-b border-border/50 p-6">
+          {!isSingleEdit && (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between text-xs font-medium tracking-wider text-muted-foreground uppercase">
+                <span>
+                  Step {variantIndex + 1} of {totalVariants}
+                </span>
+              </div>
+              <div className="flex gap-1.5">
+                {Array.from({ length: totalVariants }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 flex-1 rounded-full transition-colors ${
+                      i < variantIndex
+                        ? "bg-primary/50"
+                        : i === variantIndex
+                          ? "bg-primary"
+                          : "bg-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" className="shrink-0" asChild>
               <Link href={backHref} aria-label="Go back">
@@ -152,13 +202,19 @@ export function CropperWorkspace({
                 {variant.label}
               </h1>
               <p className="text-xs text-muted-foreground md:text-sm">
-                {variant.width}x{variant.height} px • Step {variantIndex + 1} of {totalVariants}
+                Target: {variant.width}x{variant.height} px
+                {imageResolution && (
+                  <>
+                    <br />
+                    Source: {imageResolution.width}x{imageResolution.height} px
+                  </>
+                )}
               </p>
             </div>
           </div>
         </div>
         <div className="flex flex-1 flex-col gap-8 p-6">
-          <ZoomControl zoom={zoom} onZoomChange={setZoom} />
+          <ZoomControl zoom={zoom} onZoomChange={setZoom} onZoom1to1={handleZoom1to1} />
           <RotationControl rotation={rotation} onRotationChange={setRotation} />
         </div>
         <div className="flex flex-col gap-3 border-t border-border/50 p-6">
