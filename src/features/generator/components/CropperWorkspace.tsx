@@ -7,7 +7,7 @@ import { exportCroppedImage } from "@/lib/canvas";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Cropper, { Area, Point } from "react-easy-crop";
 import { RotationControl } from "./RotationControl";
 import { ZoomControl } from "./ZoomControl";
@@ -39,6 +39,7 @@ export function CropperWorkspace({
   const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (crops[variantKey]) {
@@ -82,13 +83,15 @@ export function CropperWorkspace({
         croppedBlobUrl,
       });
 
-      if (isSingleEdit) {
-        router.push(`/create/${game.id}/review`);
-      } else if (nextVariant) {
-        router.push(`/create/${game.id}/${nextVariant.key}`);
-      } else {
-        router.push(`/create/${game.id}/review`);
-      }
+      startTransition(() => {
+        if (isSingleEdit) {
+          router.push(`/create/${game.id}/review`);
+        } else if (nextVariant) {
+          router.push(`/create/${game.id}/${nextVariant.key}`);
+        } else {
+          router.push(`/create/${game.id}/review`);
+        }
+      });
     } catch (e) {
       console.error(e);
       alert("Failed to process the image. Please try a different image.");
@@ -98,13 +101,15 @@ export function CropperWorkspace({
   };
 
   const handleSkip = () => {
-    if (isSingleEdit) {
-      router.push(`/create/${game.id}/review`);
-    } else if (nextVariant) {
-      router.push(`/create/${game.id}/${nextVariant.key}`);
-    } else {
-      router.push(`/create/${game.id}/review`);
-    }
+    startTransition(() => {
+      if (isSingleEdit) {
+        router.push(`/create/${game.id}/review`);
+      } else if (nextVariant) {
+        router.push(`/create/${game.id}/${nextVariant.key}`);
+      } else {
+        router.push(`/create/${game.id}/review`);
+      }
+    });
   };
 
   if (!imageUrl) return null;
@@ -159,18 +164,18 @@ export function CropperWorkspace({
         <div className="flex flex-col gap-3 border-t border-border/50 p-6">
           <Button
             onClick={handleSave}
-            disabled={isProcessing}
+            disabled={isProcessing || isPending}
             size="lg"
             className="w-full text-base"
           >
-            {isProcessing ? "Processing..." : isSingleEdit ? "Save" : "Save & Next"}
+            {isProcessing || isPending ? "Processing..." : isSingleEdit ? "Save" : "Save & Next"}
           </Button>
           {isSingleEdit ? (
             <Button
               variant="secondary"
               size="lg"
               onClick={handleSkip}
-              disabled={isProcessing}
+              disabled={isProcessing || isPending}
               className="w-full text-base"
             >
               Cancel Edit
@@ -181,7 +186,7 @@ export function CropperWorkspace({
                 variant="secondary"
                 size="lg"
                 onClick={handleSkip}
-                disabled={isProcessing}
+                disabled={isProcessing || isPending}
                 className="w-full text-base"
               >
                 Skip Variant

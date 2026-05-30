@@ -7,7 +7,7 @@ import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
 import { generateGameZip } from "@/features/generator/utils/export";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useTransition } from "react";
 
 export default function ReviewPage({ params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = use(params);
@@ -17,6 +17,7 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   const { crops, clearSession } = usePortraitStore();
   const [isExporting, setIsExporting] = useState(false);
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!game) {
@@ -81,8 +82,10 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   };
 
   const handleStartOver = () => {
-    clearSession();
-    router.push(`/create/${gameId}/select`);
+    startTransition(() => {
+      clearSession();
+      router.push(`/create/${gameId}/select`);
+    });
   };
 
   return (
@@ -98,11 +101,15 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         </div>
 
         <div className="flex flex-wrap items-center gap-5">
-          <Button variant="outline" onClick={handleStartOver}>
+          <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
             <RefreshCw className="mr-1 size-5" />
-            Start Over
+            {isPending ? "Starting Over..." : "Start Over"}
           </Button>
-          <Button onClick={handleDownloadZip} disabled={isExporting || isMissingRequired} size="lg">
+          <Button
+            onClick={handleDownloadZip}
+            disabled={isExporting || isMissingRequired || isPending}
+            size="lg"
+          >
             {isExporting ? (
               "Packaging..."
             ) : (
@@ -115,7 +122,7 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         </div>
       </div>
 
-      {isMissingRequired && (
+      {isMissingRequired && !isPending && (
         <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
           <strong>Cannot create ZIP:</strong> You must crop all non-optional portraits before
           generating a ZIP archive. Please click the Edit icon on the missing variants to complete
