@@ -12,21 +12,26 @@ import { useParams } from "next/navigation";
 interface PortraitPreviewCardProps {
   variant: PortraitVariant;
   crop?: CropState;
+  isUniformMode?: boolean;
 }
 
-export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps) {
+export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPreviewCardProps) {
   const hasCrop = !!crop?.croppedBlobUrl;
   const params = useParams<{ gameId: string }>();
 
   return (
     <div
       className={cn(
-        "flex w-fit max-w-full min-w-70 flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all",
+        "flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all",
         !hasCrop && !variant.optional ? "border-destructive/50" : "border-border/50",
+        isUniformMode ? "w-86" : "w-fit max-w-full min-w-70",
       )}
     >
       <div
-        className="group relative flex w-full items-center justify-center overflow-hidden bg-black/10"
+        className={cn(
+          "group relative flex w-full items-center justify-center overflow-hidden bg-black/10",
+          isUniformMode && "h-140",
+        )}
         style={{
           aspectRatio: `${variant.width} / ${variant.height}`,
         }}
@@ -49,7 +54,10 @@ export function PortraitPreviewCard({ variant, crop }: PortraitPreviewCardProps)
             width={variant.width}
             height={variant.height}
             unoptimized
-            className="relative z-10 shadow-2xl ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-(--hover-scale)"
+            className={cn(
+              "relative z-10 shadow-2xl ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-(--hover-scale)",
+              isUniformMode && "h-full w-full object-contain",
+            )}
             style={
               {
                 width: `${variant.width}px`,

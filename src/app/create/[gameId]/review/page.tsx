@@ -1,10 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { Label } from "@/components/ui/Label";
+import { Switch } from "@/components/ui/Switch";
 import { GAMES } from "@/data/games";
 import { PortraitPreviewCard } from "@/features/generator/components/PortraitPreviewCard";
 import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
 import { generateGameZip } from "@/features/generator/utils/export";
+import { useMounted } from "@/hooks/useMounted";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState, useTransition } from "react";
@@ -18,6 +22,8 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   const [isExporting, setIsExporting] = useState(false);
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const { isUniformMode, setUniformMode } = useSettingsStore();
+  const isMounted = useMounted();
 
   useEffect(() => {
     if (!game) {
@@ -100,25 +106,41 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-5">
-          <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
-            <RefreshCw className="mr-1 size-5" />
-            {isPending ? "Starting Over..." : "Start Over"}
-          </Button>
-          <Button
-            onClick={handleDownloadZip}
-            disabled={isExporting || isMissingRequired || isPending}
-            size="lg"
-          >
-            {isExporting ? (
-              "Packaging..."
-            ) : (
-              <>
-                <FileArchive className="mr-1 size-5" />
-                Download All
-              </>
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-3">
+            <Label
+              htmlFor="view-mode"
+              className="cursor-pointer text-sm font-medium text-muted-foreground"
+            >
+              Uniform Cards
+            </Label>
+            {isMounted && (
+              <Switch id="view-mode" checked={isUniformMode} onCheckedChange={setUniformMode} />
             )}
-          </Button>
+          </div>
+
+          <div className="hidden h-8 w-px bg-border/50 md:block" />
+
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
+              <RefreshCw className="mr-1 size-5" />
+              {isPending ? "Starting Over..." : "Start Over"}
+            </Button>
+            <Button
+              onClick={handleDownloadZip}
+              disabled={isExporting || isMissingRequired || isPending}
+              size="lg"
+            >
+              {isExporting ? (
+                "Packaging..."
+              ) : (
+                <>
+                  <FileArchive className="mr-1 size-5" />
+                  Download All
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -134,7 +156,12 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         {game.variants
           .toSorted((a, b) => a.height - b.height)
           .map((variant) => (
-            <PortraitPreviewCard key={variant.key} variant={variant} crop={crops[variant.key]} />
+            <PortraitPreviewCard
+              key={variant.key}
+              variant={variant}
+              crop={crops[variant.key]}
+              isUniformMode={isUniformMode}
+            />
           ))}
       </div>
     </div>
