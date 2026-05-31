@@ -5,6 +5,7 @@ import JSZip from "jszip";
 export async function generateGameZip(
   game: GamePreset,
   crops: Record<string, CropState | undefined>,
+  portraitName: string,
 ): Promise<Blob> {
   const zip = new JSZip();
 
@@ -36,8 +37,15 @@ export async function generateGameZip(
 
     if (result.value) {
       const { variant, blob } = result.value;
-      const safeFilename = variant.filename.replace(/[^a-zA-Z0-9.\-_]/g, "");
-      zip.file(safeFilename, blob);
+      const safePortraitName =
+        portraitName.replace(/[^a-zA-Z0-9.\-_ ]/g, "").trim() || game.exportConfig.defaultName;
+      let finalFilename = variant.filename.replace("{name}", safePortraitName);
+      finalFilename = finalFilename.replace(/[^a-zA-Z0-9.\-_]/g, "");
+
+      const zipPath = game.exportConfig.wrapInFolder
+        ? `${safePortraitName}/${finalFilename}`
+        : finalFilename;
+      zip.file(zipPath, blob);
     }
   }
 

@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/Button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import type { PortraitVariant } from "@/data/games";
-import type { CropState } from "@/store/usePortraitStore";
-import { triggerDownload } from "@/lib/export";
 import { cn } from "@/lib/cn";
+import { triggerDownload } from "@/lib/export";
+import type { CropState } from "@/store/usePortraitStore";
 import { Download, Edit2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -101,22 +101,15 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
                 <p>Edit variant</p>
               </TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="flex-1"
-                  onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
-                >
-                  <Download className="mr-1 size-5 shrink-0" />
-                  <span className="truncate">{variant.filename}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Download {variant.filename}</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button
+              variant="outline"
+              size="lg"
+              className="flex-1"
+              onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
+            >
+              <Download className="mr-1 size-5 shrink-0" />
+              <span className="truncate">Download</span>
+            </Button>
           </div>
         )}
       </div>

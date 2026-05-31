@@ -38,6 +38,11 @@ export interface GamePreset {
   name: string;
   description?: string;
   cover: StaticImageData;
+  exportConfig: {
+    wrapInFolder: boolean;
+    defaultName: string;
+    maxLength?: number;
+  };
   variants: PortraitVariant[];
   installNotes?: React.ReactNode;
   sourceUrl?: string;
@@ -141,6 +146,10 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <OwlcatNotes path="%userprofile%\AppData\LocalLow\Owlcat Games\Pathfinder Kingmaker\Portraits" />
     ),
+    exportConfig: {
+      wrapInFolder: true,
+      defaultName: "0001",
+    },
     variants: [
       {
         key: "large",
@@ -175,6 +184,10 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <OwlcatNotes path="%userprofile%\AppData\LocalLow\Owlcat Games\Pathfinder Wrath Of The Righteous\Portraits" />
     ),
+    exportConfig: {
+      wrapInFolder: true,
+      defaultName: "0001",
+    },
     variants: [
       {
         key: "large",
@@ -209,6 +222,10 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <OwlcatNotes path="%userprofile%\AppData\LocalLow\Owlcat Games\Warhammer 40000 Rogue Trader\Portraits" />
     ),
+    exportConfig: {
+      wrapInFolder: true,
+      defaultName: "0001",
+    },
     variants: [
       {
         key: "large",
@@ -243,6 +260,10 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <ObsidianNotes path="<Install Directory>\PillarsOfEternity_Data\data\art\gui\portraits\player\male" />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "player",
+    },
     variants: [
       {
         key: "large",
@@ -250,7 +271,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "png",
-        filename: "portrait_lg.png",
+        filename: "{name}_lg.png",
       },
       {
         key: "small",
@@ -258,7 +279,7 @@ export const GAMES: GamePreset[] = [
         width: 76,
         height: 96,
         format: "png",
-        filename: "portrait_sm.png",
+        filename: "{name}_sm.png",
       },
     ],
   },
@@ -269,6 +290,10 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <ObsidianNotes path="<Install Directory>\PillarsOfEternityII_Data\gui\portraits\player\male" />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "player",
+    },
     variants: [
       {
         key: "large",
@@ -276,7 +301,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "png",
-        filename: "portrait_lg.png",
+        filename: "{name}_lg.png",
       },
       {
         key: "small",
@@ -284,7 +309,7 @@ export const GAMES: GamePreset[] = [
         width: 76,
         height: 96,
         format: "png",
-        filename: "portrait_sm.png",
+        filename: "{name}_sm.png",
       },
     ],
   },
@@ -295,6 +320,11 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <InfinityEngineNotes path="Documents\Baldur's Gate - Enhanced Edition\portraits" />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "CUSTOM",
+      maxLength: 7,
+    },
     variants: [
       {
         key: "large",
@@ -302,7 +332,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "bmp",
-        filename: "CUSTOM_L.bmp",
+        filename: "{name}L.bmp",
       },
       {
         key: "medium",
@@ -310,7 +340,7 @@ export const GAMES: GamePreset[] = [
         width: 169,
         height: 266,
         format: "bmp",
-        filename: "CUSTOM_M.bmp",
+        filename: "{name}M.bmp",
       },
       {
         key: "small",
@@ -318,7 +348,7 @@ export const GAMES: GamePreset[] = [
         width: 54,
         height: 84,
         format: "bmp",
-        filename: "CUSTOM_S.bmp",
+        filename: "{name}S.bmp",
       },
     ],
   },
@@ -329,6 +359,11 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <InfinityEngineNotes path="Documents\Baldur's Gate II - Enhanced Edition\portraits" />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "CUSTOM",
+      maxLength: 7,
+    },
     variants: [
       {
         key: "large",
@@ -336,7 +371,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "bmp",
-        filename: "CUSTOM_L.bmp",
+        filename: "{name}L.bmp",
       },
       {
         key: "medium",
@@ -344,7 +379,7 @@ export const GAMES: GamePreset[] = [
         width: 169,
         height: 266,
         format: "bmp",
-        filename: "CUSTOM_M.bmp",
+        filename: "{name}M.bmp",
       },
       {
         key: "small",
@@ -352,7 +387,7 @@ export const GAMES: GamePreset[] = [
         width: 54,
         height: 84,
         format: "bmp",
-        filename: "CUSTOM_S.bmp",
+        filename: "{name}S.bmp",
       },
     ],
   },
@@ -360,6 +395,10 @@ export const GAMES: GamePreset[] = [
     id: "tyranny",
     name: "Tyranny",
     cover: coverTyranny,
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "player",
+    },
     installNotes: (
       <>
         <ObsidianNotes path="<Install Directory>\Data\data\art\gui\portraits\player\male" />
@@ -376,7 +415,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "png",
-        filename: "portrait_lg.png",
+        filename: "{name}_lg.png",
       },
       {
         key: "small",
@@ -384,7 +423,7 @@ export const GAMES: GamePreset[] = [
         width: 76,
         height: 96,
         format: "png",
-        filename: "portrait_sm.png",
+        filename: "{name}_sm.png",
       },
     ],
   },
@@ -395,6 +434,11 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <InfinityEngineNotes path="Documents\Icewind Dale - Enhanced Edition\portraits" />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "CUSTOM",
+      maxLength: 7,
+    },
     variants: [
       {
         key: "large",
@@ -402,7 +446,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "bmp",
-        filename: "CUSTOM_L.bmp",
+        filename: "{name}L.bmp",
       },
       {
         key: "medium",
@@ -410,7 +454,7 @@ export const GAMES: GamePreset[] = [
         width: 169,
         height: 266,
         format: "bmp",
-        filename: "CUSTOM_M.bmp",
+        filename: "{name}M.bmp",
       },
       {
         key: "small",
@@ -418,7 +462,7 @@ export const GAMES: GamePreset[] = [
         width: 54,
         height: 84,
         format: "bmp",
-        filename: "CUSTOM_S.bmp",
+        filename: "{name}S.bmp",
       },
     ],
   },
@@ -443,6 +487,11 @@ export const GAMES: GamePreset[] = [
         </p>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "CUSTOM",
+      maxLength: 7,
+    },
     variants: [
       {
         key: "large",
@@ -450,7 +499,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "bmp",
-        filename: "CUSTOM_L.bmp",
+        filename: "{name}L.bmp",
       },
       {
         key: "small",
@@ -458,7 +507,7 @@ export const GAMES: GamePreset[] = [
         width: 42,
         height: 42,
         format: "bmp",
-        filename: "CUSTOM_S.bmp",
+        filename: "{name}S.bmp",
       },
     ],
   },
@@ -473,6 +522,10 @@ export const GAMES: GamePreset[] = [
         gogPath="<Install Directory>\Shadowrun Returns\Shadowrun_Data\StreamingAssets\ContentPacks\seattle\art\portraits"
       />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom_portrait",
+    },
     variants: [
       {
         key: "large",
@@ -480,7 +533,7 @@ export const GAMES: GamePreset[] = [
         width: 212,
         height: 278,
         format: "png",
-        filename: "custom_portrait.png",
+        filename: "{name}.png",
       },
     ],
   },
@@ -495,6 +548,10 @@ export const GAMES: GamePreset[] = [
         gogPath="<Install Directory>\Shadowrun Dragonfall Director's Cut\Dragonfall_Data\StreamingAssets\ContentPacks\berlin\art\portraits"
       />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom_portrait",
+    },
     variants: [
       {
         key: "large",
@@ -502,7 +559,7 @@ export const GAMES: GamePreset[] = [
         width: 212,
         height: 278,
         format: "png",
-        filename: "custom_portrait.png",
+        filename: "{name}.png",
       },
     ],
   },
@@ -517,6 +574,10 @@ export const GAMES: GamePreset[] = [
         gogPath="<Install Directory>\Shadowrun Hong Kong\SRHK_Data\StreamingAssets\ContentPacks\HongKong\art\portraits"
       />
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom_portrait",
+    },
     variants: [
       {
         key: "large",
@@ -524,7 +585,7 @@ export const GAMES: GamePreset[] = [
         width: 212,
         height: 278,
         format: "png",
-        filename: "custom_portrait.png",
+        filename: "{name}.png",
       },
     ],
   },
@@ -545,6 +606,10 @@ export const GAMES: GamePreset[] = [
         </p>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom",
+    },
     variants: [
       {
         key: "huge",
@@ -552,7 +617,7 @@ export const GAMES: GamePreset[] = [
         width: 256,
         height: 512,
         format: "tga",
-        filename: "custom_h.tga",
+        filename: "{name}_h.tga",
       },
       {
         key: "large",
@@ -560,7 +625,7 @@ export const GAMES: GamePreset[] = [
         width: 128,
         height: 256,
         format: "tga",
-        filename: "custom_l.tga",
+        filename: "{name}_l.tga",
       },
       {
         key: "medium",
@@ -568,7 +633,7 @@ export const GAMES: GamePreset[] = [
         width: 64,
         height: 128,
         format: "tga",
-        filename: "custom_m.tga",
+        filename: "{name}_m.tga",
       },
       {
         key: "small",
@@ -576,7 +641,7 @@ export const GAMES: GamePreset[] = [
         width: 32,
         height: 64,
         format: "tga",
-        filename: "custom_s.tga",
+        filename: "{name}_s.tga",
       },
       {
         key: "tiny",
@@ -584,7 +649,7 @@ export const GAMES: GamePreset[] = [
         width: 16,
         height: 32,
         format: "tga",
-        filename: "custom_t.tga",
+        filename: "{name}_t.tga",
       },
     ],
   },
@@ -601,6 +666,10 @@ export const GAMES: GamePreset[] = [
         <pre>Documents\Neverwinter Nights 2\portraits</pre>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom",
+    },
     variants: [
       {
         key: "large",
@@ -608,7 +677,7 @@ export const GAMES: GamePreset[] = [
         width: 128,
         height: 128,
         format: "tga",
-        filename: "custom.tga",
+        filename: "{name}.tga",
       },
     ],
   },
@@ -633,6 +702,11 @@ export const GAMES: GamePreset[] = [
         </p>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "CUSTOM",
+      maxLength: 7,
+    },
     variants: [
       {
         key: "large",
@@ -640,7 +714,7 @@ export const GAMES: GamePreset[] = [
         width: 210,
         height: 330,
         format: "bmp",
-        filename: "CUSTOM_L.bmp",
+        filename: "{name}L.bmp",
       },
       {
         key: "small",
@@ -648,7 +722,7 @@ export const GAMES: GamePreset[] = [
         width: 54,
         height: 84,
         format: "bmp",
-        filename: "CUSTOM_S.bmp",
+        filename: "{name}S.bmp",
       },
     ],
   },
@@ -665,6 +739,10 @@ export const GAMES: GamePreset[] = [
         <pre>Documents\My Games\Wasteland2DC\CustomPortraits</pre>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom_portrait",
+    },
     variants: [
       {
         key: "large",
@@ -672,7 +750,7 @@ export const GAMES: GamePreset[] = [
         width: 256,
         height: 256,
         format: "png",
-        filename: "custom_portrait.png",
+        filename: "{name}.png",
       },
     ],
   },
@@ -689,6 +767,10 @@ export const GAMES: GamePreset[] = [
         <pre>Documents\My Games\Wasteland3\CustomPortraits</pre>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom_portrait",
+    },
     variants: [
       {
         key: "large",
@@ -696,7 +778,7 @@ export const GAMES: GamePreset[] = [
         width: 256,
         height: 256,
         format: "png",
-        filename: "custom_portrait.png",
+        filename: "{name}.png",
       },
     ],
   },
@@ -716,6 +798,10 @@ export const GAMES: GamePreset[] = [
         </p>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom",
+    },
     variants: [
       {
         key: "large",
@@ -723,7 +809,7 @@ export const GAMES: GamePreset[] = [
         width: 128,
         height: 128,
         format: "bmp",
-        filename: "custom_b.bmp",
+        filename: "{name}_b.bmp",
       },
       {
         key: "small",
@@ -731,7 +817,7 @@ export const GAMES: GamePreset[] = [
         width: 64,
         height: 64,
         format: "bmp",
-        filename: "custom.bmp",
+        filename: "{name}.bmp",
       },
     ],
   },
@@ -751,6 +837,10 @@ export const GAMES: GamePreset[] = [
         </p>
       </>
     ),
+    exportConfig: {
+      wrapInFolder: false,
+      defaultName: "custom_male",
+    },
     variants: [
       {
         key: "large",
@@ -758,7 +848,7 @@ export const GAMES: GamePreset[] = [
         width: 182,
         height: 216,
         format: "png",
-        filename: "male_custom.png",
+        filename: "{name}.png",
       },
     ],
   },

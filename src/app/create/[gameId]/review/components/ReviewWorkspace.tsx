@@ -1,19 +1,21 @@
 "use client";
 
+import { PortraitPreviewCard } from "@/app/create/components/PortraitPreviewCard";
 import { Button } from "@/components/ui/Button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/Field";
+import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
 import { Switch } from "@/components/ui/Switch";
 import type { GamePreset } from "@/data/games";
-import { PortraitPreviewCard } from "@/app/create/components/PortraitPreviewCard";
-import { usePortraitStore } from "@/store/usePortraitStore";
-import { generateGameZip } from "@/lib/export";
 import { useMounted } from "@/hooks/useMounted";
+import { generateGameZip } from "@/lib/export";
+import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 
 interface ReviewWorkspaceProps {
   game: GamePreset;
@@ -23,8 +25,8 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
   const router = useRouter();
 
   const { crops, clearSession } = usePortraitStore();
-  const [isExporting, setIsExporting] = useState(false);
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
+  const [portraitName, setPortraitName] = useState(game.exportConfig.defaultName);
   const [isPending, startTransition] = useTransition();
   const { isUniformMode, setUniformMode } = useSettingsStore();
   const isMounted = useMounted();
@@ -43,11 +45,14 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
     };
   }, [zipBlobUrl]);
 
-  const handleDownloadZip = async () => {
+  const safePortraitName = portraitName.trim() || game.exportConfig.defaultName;
+  const downloadName = `${game.id}-portraits.zip`;
+
+  const [, formAction, isExporting] = useActionState(async () => {
     if (zipBlobUrl) {
       const a = document.createElement("a");
       a.href = zipBlobUrl;
-      a.download = `${game.id}-portraits.zip`;
+      a.download = downloadName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -55,14 +60,13 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
     }
 
     try {
-      setIsExporting(true);
-      const zipBlob = await generateGameZip(game, crops);
+      const zipBlob = await generateGameZip(game, crops, safePortraitName);
       const url = URL.createObjectURL(zipBlob);
       setZipBlobUrl(url);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${game.id}-portraits.zip`;
+      a.download = downloadName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -73,10 +77,8 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
           ? error.message
           : "Failed to generate ZIP file. Please download individual files instead.";
       alert(msg);
-    } finally {
-      setIsExporting(false);
     }
-  };
+  }, null);
 
   const handleStartOver = () => {
     startTransition(() => {
@@ -87,8 +89,8 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 pt-8 pb-20">
-      <div className="flex flex-col items-center gap-4 md:justify-between lg:flex-row">
-        <div className="mb-2 text-center lg:mb-0 lg:text-left">
+      <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
+        <div className="text-center md:text-left">
           <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
             Review Portraits
           </h1>
@@ -106,25 +108,11 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
               <Switch id="view-mode" checked={isUniformMode} onCheckedChange={setUniformMode} />
             )}
           </div>
-
-          <Separator orientation="vertical" className="hidden md:block" />
-
-          <div className="flex items-center gap-6">
-            <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
-              <RefreshCw className="mr-1 size-5" />
-              {isPending ? "Starting Over..." : "Start Over"}
-            </Button>
-            <Button onClick={handleDownloadZip} disabled={isExporting || isPending} size="lg">
-              {isExporting ? (
-                "Packaging..."
-              ) : (
-                <>
-                  <FileArchive className="mr-1 size-5" />
-                  Download All
-                </>
-              )}
-            </Button>
-          </div>
+          <Separator orientation="vertical" className="hidden h-8 md:block" />
+          <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
+            <RefreshCw className="mr-2 size-4" />
+            {isPending ? "Starting Over..." : "Start Over"}
+          </Button>
         </div>
       </div>
 
@@ -142,6 +130,48 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
             />
           ))}
       </div>
+
+      <form className="sticky bottom-4 z-50 mx-auto w-full max-w-4xl pt-6 pb-2" action={formAction}>
+        <Panel className="flex flex-col items-center justify-between gap-4 bg-background/95 px-6 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] backdrop-blur supports-backdrop-filter:bg-background/80 md:flex-row dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
+          <Field orientation="horizontal" className="w-auto items-center gap-4">
+            <FieldLabel
+              htmlFor="portrait-name"
+              className="font-medium whitespace-nowrap text-foreground"
+            >
+              Portrait Name
+            </FieldLabel>
+            <div className="relative flex flex-col">
+              <Input
+                id="portrait-name"
+                value={portraitName}
+                onChange={(e) => setPortraitName(e.target.value)}
+                className="peer w-48 bg-background font-mono invalid:border-destructive invalid:ring-destructive/20"
+                pattern="^[a-zA-Z0-9.\-_ ]*$"
+                maxLength={game.exportConfig.maxLength || 50}
+                title={`Only letters, numbers, spaces, dots, dashes, and underscores are allowed. Max length: ${game.exportConfig.maxLength || 50} characters.`}
+              />
+              <FieldError className="absolute top-full mt-1 hidden text-[11px] font-medium whitespace-nowrap text-destructive peer-invalid:block">
+                Invalid characters
+              </FieldError>
+            </div>
+          </Field>
+          <Button
+            type="submit"
+            disabled={isExporting || isPending}
+            size="lg"
+            className="w-full shadow-lg md:w-auto"
+          >
+            {isExporting ? (
+              "Packaging..."
+            ) : (
+              <>
+                <FileArchive className="mr-2 size-5" />
+                Download All
+              </>
+            )}
+          </Button>
+        </Panel>
+      </form>
 
       <Separator className="my-12" />
 
