@@ -1,4 +1,4 @@
-import { BackgroundDecorations } from "@/components/ui/BackgroundDecorations";
+import { BackgroundDecorations } from "@/components/layout/BackgroundDecorations";
 import { GAMES } from "@/data/games";
 import Image from "next/image";
 import Link from "next/link";

@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
 import type { GamePreset, PortraitVariant } from "@/data/games";
-import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
+import { usePortraitStore } from "@/store/usePortraitStore";
 import { exportCroppedImage } from "@/lib/canvas";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Cropper, { Area, Point } from "react-easy-crop";
 import { RotationControl } from "./RotationControl";
@@ -21,6 +21,8 @@ interface CropperWorkspaceProps {
   totalVariants: number;
   nextVariant?: PortraitVariant;
   variantKey: string;
+  isSingleEdit: boolean;
+  imageUrl: string;
 }
 
 export function CropperWorkspace({
@@ -30,11 +32,11 @@ export function CropperWorkspace({
   totalVariants,
   nextVariant,
   variantKey,
+  isSingleEdit,
+  imageUrl,
 }: CropperWorkspaceProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const isSingleEdit = searchParams.get("singleEdit") === "true";
-  const { imageUrl, crops, setCrop } = usePortraitStore();
+  const { crops, setCrop } = usePortraitStore();
 
   const [crop, setCropState] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -56,11 +58,6 @@ export function CropperWorkspace({
   }, [crops, variantKey]);
 
   useEffect(() => {
-    if (!imageUrl) {
-      router.replace(`/create/${game.id}/select`);
-      return;
-    }
-
     let isMounted = true;
     const img = new Image();
     img.onload = () => {
@@ -73,7 +70,7 @@ export function CropperWorkspace({
     return () => {
       isMounted = false;
     };
-  }, [imageUrl, game.id, router]);
+  }, [imageUrl]);
 
   const handleZoom1to1 = () => {
     if (croppedAreaPixels) {
@@ -138,8 +135,6 @@ export function CropperWorkspace({
       }
     });
   };
-
-  if (!imageUrl) return null;
 
   const aspect = variant.width / variant.height;
   const previousVariant = variantIndex > 0 ? game.variants[variantIndex - 1] : undefined;

@@ -1,5 +1,5 @@
 import { GamePreset } from "@/data/games";
-import { CropState } from "@/features/generator/store/usePortraitStore";
+import { CropState } from "@/store/usePortraitStore";
 import JSZip from "jszip";
 
 export async function generateGameZip(

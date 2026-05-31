@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/Button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import type { PortraitVariant } from "@/data/games";
-import type { CropState } from "@/features/generator/store/usePortraitStore";
-import { triggerDownload } from "@/features/generator/utils/export";
+import type { CropState } from "@/store/usePortraitStore";
+import { triggerDownload } from "@/lib/export";
 import { cn } from "@/lib/cn";
 import { Download, Edit2 } from "lucide-react";
 import Image from "next/image";
