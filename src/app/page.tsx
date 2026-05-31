@@ -20,13 +20,13 @@ export default function Home() {
         </div>
 
         <div className="mb-12">
-          <h2 className="mb-8 text-center font-display text-3xl font-bold">Select a Game</h2>
+          <h2 className="mb-8 text-center font-display text-3xl font-bold">Select a Preset</h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {GAMES.map((game) => (
               <Link
                 key={game.id}
                 href={`/create/${game.id}/select`}
-                className="group relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-muted shadow-sm transition-all hover:border-primary/50 hover:shadow-lg"
+                className="group relative flex aspect-video w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-border/50 bg-muted shadow-sm transition-all hover:border-primary/50 hover:shadow-lg"
               >
                 <Image
                   src={game.cover}
@@ -34,11 +34,10 @@ export default function Home() {
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   placeholder="blur"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="object-cover brightness-40 transition-all duration-700 group-hover:scale-110 group-hover:brightness-[0.25]"
                 />
-                <div className="absolute inset-0 bg-black/50 transition-colors duration-500 group-hover:bg-black/70" />
                 <div className="relative z-10 p-6 text-center">
-                  <h3 className="font-display text-2xl font-bold tracking-tight text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
+                  <h3 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
                     {game.name}
                   </h3>
                 </div>

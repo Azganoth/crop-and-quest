@@ -152,6 +152,12 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         </div>
       )}
 
+      {game.installNotes && (
+        <div className="rounded-lg border border-border/50 bg-secondary/50 p-4 text-sm text-secondary-foreground">
+          <strong>Install Notes:</strong> {game.installNotes}
+        </div>
+      )}
+
       <div className="flex flex-wrap items-start justify-center gap-6">
         {game.variants
           .toSorted((a, b) => a.height - b.height)
