@@ -82,8 +82,11 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
   return (
     <div className="flex flex-1 flex-col items-center justify-center p-4">
       <div className="flex w-full max-w-xl flex-col items-center border border-border/50 bg-card p-6 text-center shadow-xl md:p-10">
-        <h1 className="mb-4 font-display text-2xl font-bold text-primary capitalize">
-          Prepare a portrait for {game?.name || gameId.replace("-", " ")}
+        <h1 className="mb-4 font-display text-2xl font-bold text-primary">
+          Prepare a portrait for{" "}
+          <span className="capitalize underline decoration-primary/70 underline-offset-4">
+            {game?.name || gameId.replace("-", " ")}
+          </span>
         </h1>
         <p className="mb-8 max-w-md text-muted-foreground">
           Select the base artwork for your character. It will be used to generate all the required

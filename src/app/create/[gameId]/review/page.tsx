@@ -102,7 +102,9 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
             <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
               Review Portraits
             </h1>
-            <p className="text-muted-foreground md:text-base">{game.name}</p>
+            <p className="text-sm font-bold tracking-widest text-muted-foreground uppercase">
+              {game.name}
+            </p>
           </div>
         </div>
 

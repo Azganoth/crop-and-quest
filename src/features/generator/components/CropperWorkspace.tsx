@@ -167,12 +167,23 @@ export function CropperWorkspace({
       </div>
       <div className="z-20 flex w-full flex-col border-l border-border/50 bg-card/80 backdrop-blur md:w-80 md:shrink-0 lg:w-96">
         <div className="flex flex-col gap-6 border-b border-border/50 p-6">
+          <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
+            {game.name}
+          </span>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" className="shrink-0" asChild>
+              <Link href={backHref} aria-label="Go back">
+                <ArrowLeft className="size-6" />
+              </Link>
+            </Button>
+            <h1 className="font-display text-xl font-bold text-primary capitalize md:text-2xl">
+              {variant.label}
+            </h1>
+          </div>
           {!isSingleEdit && (
             <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                <span>
-                  Step {variantIndex + 1} of {totalVariants}
-                </span>
+              <div className="flex items-center justify-center text-sm font-medium tracking-wider text-muted-foreground uppercase">
+                Step {variantIndex + 1} of {totalVariants}
               </div>
               <div className="flex gap-1.5">
                 {Array.from({ length: totalVariants }).map((_, i) => (
@@ -190,32 +201,23 @@ export function CropperWorkspace({
               </div>
             </div>
           )}
-
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" className="shrink-0" asChild>
-              <Link href={backHref} aria-label="Go back">
-                <ArrowLeft className="size-6" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="font-display text-xl font-bold text-primary capitalize md:text-2xl">
-                {variant.label}
-              </h1>
-              <p className="text-xs text-muted-foreground md:text-sm">
-                Target: {variant.width}x{variant.height} px
-                {imageResolution && (
-                  <>
-                    <br />
-                    Source: {imageResolution.width}x{imageResolution.height} px
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
         </div>
         <div className="flex flex-1 flex-col gap-8 p-6">
           <ZoomControl zoom={zoom} onZoomChange={setZoom} onZoom1to1={handleZoom1to1} />
           <RotationControl rotation={rotation} onRotationChange={setRotation} />
+          <p className="mt-auto space-x-2 text-center text-xs text-muted-foreground md:text-sm">
+            <span>
+              Target: {variant.width}x{variant.height} px
+            </span>
+            {imageResolution && (
+              <>
+                <span>•</span>
+                <span>
+                  Source: {imageResolution.width}x{imageResolution.height} px
+                </span>
+              </>
+            )}
+          </p>
         </div>
         <div className="flex flex-col gap-3 border-t border-border/50 p-6">
           <Button
