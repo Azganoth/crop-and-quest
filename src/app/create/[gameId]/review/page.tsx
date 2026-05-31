@@ -152,12 +152,6 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         </div>
       )}
 
-      {game.installNotes && (
-        <div className="rounded-lg border border-border/50 bg-secondary/50 p-4 text-sm text-secondary-foreground">
-          <strong>Install Notes:</strong> {game.installNotes}
-        </div>
-      )}
-
       <div className="flex flex-wrap items-start justify-center gap-6">
         {game.variants
           .toSorted((a, b) => a.height - b.height)
@@ -170,6 +164,16 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
             />
           ))}
       </div>
+      {game.installNotes && (
+        <div className="mx-auto mt-8 w-full max-w-4xl rounded-lg border border-border/50 bg-secondary/50 p-6 text-secondary-foreground shadow-sm">
+          <h2 className="mb-4 font-display text-lg font-bold text-foreground">
+            Installation Notes
+          </h2>
+          <div className="flex flex-col gap-2 [&_p]:leading-relaxed [&_pre]:mt-1 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:border [&_pre]:border-border/50 [&_pre]:bg-background/80 [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-xs [&_pre]:break-all [&_pre]:whitespace-pre-wrap [&_pre]:text-muted-foreground [&_strong]:text-foreground">
+            {game.installNotes}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
