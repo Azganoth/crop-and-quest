@@ -207,10 +207,8 @@ The application should not require:
 
 ## Backlog
 
-- More game presets
+- Custom potrait naming
 - Custom/free mode for unsupported games
 - Custom preset builder
 - Batch portrait creation
-- Game install folder guides
-- Community-submitted presets
 - Optional portrait reference links for supported games
