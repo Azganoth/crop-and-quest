@@ -22,8 +22,7 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all",
-        !hasCrop && !variant.optional ? "border-destructive/50" : "border-border/50",
+        "flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all",
         isUniformMode ? "w-86" : "w-fit max-w-full min-w-70",
       )}
     >
@@ -68,12 +67,13 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
           />
         ) : (
           <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
-            <span className="font-semibold">Not cropped</span>
-            {variant.optional ? (
-              <span className="mt-1 opacity-75">(Optional)</span>
-            ) : (
-              <span className="mt-1 font-medium text-destructive">(Required)</span>
-            )}
+            <span className="font-semibold">Skipped</span>
+            <Button variant="secondary" className="mt-6" asChild>
+              <Link href={`/create/${params?.gameId}/${variant.key}?singleEdit=true`}>
+                <Edit2 className="mr-2 size-4" />
+                Crop Variant
+              </Link>
+            </Button>
           </div>
         )}
       </div>

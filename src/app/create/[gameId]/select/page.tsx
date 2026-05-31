@@ -1,8 +1,9 @@
 "use client";
 
+import { Panel } from "@/components/ui/Panel";
 import { GAMES } from "@/data/games";
 import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
-import { Image as ImageIcon, UploadCloud } from "lucide-react";
+import { Image as ImageIcon, ImagePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { use, useRef, useState } from "react";
 
@@ -46,7 +47,7 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
     }
 
     if (!validTypes.includes(file.type)) {
-      setError("Unsupported file format. Please upload a PNG, JPEG, or WebP image.");
+      setError("Unsupported file format. Please select a PNG, JPEG, or WebP image.");
       return;
     }
 
@@ -65,7 +66,7 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
     const uri = e.dataTransfer.getData("text/uri-list");
     if (uri && e.dataTransfer.files.length === 0) {
       setError(
-        "Cross-origin image links are not supported to prevent security errors. Please save the image to your device and upload the local file.",
+        "Cross-origin image links are not supported to prevent security errors. Please save the image to your device and load the local file.",
       );
       return;
     }
@@ -81,18 +82,17 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center p-4">
-      <div className="flex w-full max-w-xl flex-col items-center border border-border/50 bg-card p-6 text-center shadow-xl md:p-10">
-        <h1 className="mb-4 font-display text-2xl font-bold text-primary">
+      <Panel className="w-full max-w-xl items-center p-10 text-center">
+        <h1 className="font-display text-2xl font-bold text-primary">
           Prepare a portrait for{" "}
           <span className="capitalize underline decoration-primary/70 underline-offset-4">
             {game?.name || gameId.replace("-", " ")}
           </span>
         </h1>
-        <p className="mb-8 max-w-md text-muted-foreground">
+        <p className="max-w-md text-muted-foreground">
           Select the base artwork for your character. It will be used to generate all the required
           portrait variants.
         </p>
-
         <div
           className="group relative flex w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 bg-muted/20 py-16 transition-all hover:border-primary/50 hover:bg-muted/40"
           onClick={() => fileInputRef.current?.click()}
@@ -107,10 +107,10 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
             onChange={(e) => handleFile(e.target.files?.[0])}
           />
           <div className="mb-4 transition-transform group-hover:scale-110">
-            <UploadCloud className="size-8 text-muted-foreground transition-colors group-hover:text-primary" />
+            <ImagePlus className="size-8 text-muted-foreground transition-colors group-hover:text-primary" />
           </div>
-          <h3 className="mb-1 font-semibold">Click to upload</h3>
-          <p className="text-sm text-muted-foreground">or drag and drop an image here</p>
+          <h3 className="mb-1 font-semibold">Click to browse</h3>
+          <p className="text-muted-foreground">or drag and drop an image here</p>
           <div className="mt-6 flex items-center gap-2 text-muted-foreground">
             <ImageIcon className="size-4" />
             <span>Supports PNG, JPEG, WEBP (Max 10MB)</span>
@@ -122,7 +122,7 @@ export default function SelectImagePage({ params }: { params: Promise<{ gameId: 
             {error}
           </div>
         )}
-      </div>
+      </Panel>
     </div>
   );
 }

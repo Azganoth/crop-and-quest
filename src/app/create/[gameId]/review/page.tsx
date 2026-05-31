@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
+import { Panel } from "@/components/ui/Panel";
+import { Separator } from "@/components/ui/Separator";
 import { Switch } from "@/components/ui/Switch";
 import { GAMES } from "@/data/games";
 import { PortraitPreviewCard } from "@/features/generator/components/PortraitPreviewCard";
@@ -18,7 +20,7 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   const router = useRouter();
 
   const game = GAMES.find((g) => g.id === gameId);
-  const { crops, clearSession } = usePortraitStore();
+  const { crops, clearSession, imageUrl } = usePortraitStore();
   const [isExporting, setIsExporting] = useState(false);
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -28,10 +30,11 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   useEffect(() => {
     if (!game) {
       router.replace("/");
+    } else if (!imageUrl) {
+      router.replace(`/create/${game.id}/select`);
     }
-  }, [game, router]);
+  }, [game, imageUrl, router]);
 
-  // Invalidate cached zip when crops change
   useEffect(() => {
     if (zipBlobUrl) {
       URL.revokeObjectURL(zipBlobUrl);
@@ -47,10 +50,6 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   }, [zipBlobUrl]);
 
   if (!game) return null;
-
-  const isMissingRequired = game.variants.some(
-    (variant) => !variant.optional && !crops[variant.key]?.croppedBlobUrl,
-  );
 
   const handleDownloadZip = async () => {
     if (zipBlobUrl) {
@@ -95,25 +94,20 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 md:p-8">
-      <div className="flex flex-col gap-4 border-b border-border/50 pb-6 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
-              Review Portraits
-            </h1>
-            <p className="text-sm font-bold tracking-widest text-muted-foreground uppercase">
-              {game.name}
-            </p>
-          </div>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 pt-8 pb-20">
+      <div className="flex flex-col items-center gap-4 md:justify-between lg:flex-row">
+        <div className="mb-2 text-center lg:mb-0 lg:text-left">
+          <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
+            Review Portraits
+          </h1>
+          <p className="text-sm font-bold tracking-widest text-muted-foreground uppercase">
+            {game.name}
+          </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-6">
+        <div className="flex flex-col items-center gap-6 md:flex-row">
           <div className="flex items-center gap-3">
-            <Label
-              htmlFor="view-mode"
-              className="cursor-pointer text-sm font-medium text-muted-foreground"
-            >
+            <Label htmlFor="view-mode" className="cursor-pointer font-medium text-muted-foreground">
               Uniform Cards
             </Label>
             {isMounted && (
@@ -121,18 +115,14 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
             )}
           </div>
 
-          <div className="hidden h-8 w-px bg-border/50 md:block" />
+          <Separator orientation="vertical" className="hidden md:block" />
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
             <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
               <RefreshCw className="mr-1 size-5" />
               {isPending ? "Starting Over..." : "Start Over"}
             </Button>
-            <Button
-              onClick={handleDownloadZip}
-              disabled={isExporting || isMissingRequired || isPending}
-              size="lg"
-            >
+            <Button onClick={handleDownloadZip} disabled={isExporting || isPending} size="lg">
               {isExporting ? (
                 "Packaging..."
               ) : (
@@ -146,15 +136,9 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
         </div>
       </div>
 
-      {isMissingRequired && !isPending && (
-        <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
-          <strong>Cannot create ZIP:</strong> You must crop all non-optional portraits before
-          generating a ZIP archive. Please click the Edit icon on the missing variants to complete
-          them.
-        </div>
-      )}
+      <Separator className="my-3" />
 
-      <div className="flex flex-wrap items-start justify-center gap-6">
+      <div className="flex flex-wrap items-start justify-center gap-8">
         {game.variants
           .toSorted((a, b) => a.height - b.height)
           .map((variant) => (
@@ -166,15 +150,16 @@ export default function ReviewPage({ params }: { params: Promise<{ gameId: strin
             />
           ))}
       </div>
+
+      <Separator className="my-12" />
+
       {game.installNotes && (
-        <div className="mx-auto mt-8 w-full max-w-4xl rounded-lg border border-border/50 bg-secondary/50 p-6 text-secondary-foreground shadow-sm">
-          <h2 className="mb-4 font-display text-lg font-bold text-foreground">
-            Installation Notes
-          </h2>
-          <div className="flex flex-col gap-2 [&_p]:leading-relaxed [&_pre]:mt-1 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:border [&_pre]:border-border/50 [&_pre]:bg-background/80 [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-xs [&_pre]:break-all [&_pre]:whitespace-pre-wrap [&_pre]:text-muted-foreground [&_strong]:text-foreground">
+        <Panel className="mx-auto w-full max-w-4xl">
+          <h2 className="font-display text-lg font-bold text-foreground">Installation Notes</h2>
+          <div className="flex flex-col gap-2 [&_p]:leading-relaxed [&_pre]:mt-1 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:border [&_pre]:border-border/50 [&_pre]:bg-background/80 [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:break-all [&_pre]:whitespace-pre-wrap [&_pre]:text-muted-foreground [&_strong]:text-foreground">
             {game.installNotes}
           </div>
-        </div>
+        </Panel>
       )}
     </div>
   );

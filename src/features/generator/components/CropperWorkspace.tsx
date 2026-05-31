@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { Panel } from "@/components/ui/Panel";
+import { Separator } from "@/components/ui/Separator";
 import type { GamePreset, PortraitVariant } from "@/data/games";
 import { usePortraitStore } from "@/features/generator/store/usePortraitStore";
 import { exportCroppedImage } from "@/lib/canvas";
@@ -148,8 +150,8 @@ export function CropperWorkspace({
       : `/create/${game.id}/select`;
 
   return (
-    <div className="relative flex flex-1 flex-col md:flex-row">
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black/95">
+    <div className="relative flex flex-1 flex-col overflow-hidden md:flex-row">
+      <div className="relative flex flex-1 items-center justify-center">
         <Cropper
           image={imageUrl}
           crop={crop}
@@ -165,8 +167,8 @@ export function CropperWorkspace({
           maxZoom={MAX_ZOOM}
         />
       </div>
-      <div className="z-20 flex w-full flex-col border-l border-border/50 bg-card/80 backdrop-blur md:w-80 md:shrink-0 lg:w-96">
-        <div className="flex flex-col gap-6 border-b border-border/50 p-6">
+      <Panel className="z-20 w-full md:m-6 md:w-80 md:shrink-0 lg:w-96">
+        <div className="flex flex-col gap-6">
           <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
             {game.name}
           </span>
@@ -202,10 +204,13 @@ export function CropperWorkspace({
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-8 p-6">
+
+        <Separator />
+
+        <div className="flex flex-1 flex-col gap-8">
           <ZoomControl zoom={zoom} onZoomChange={setZoom} onZoom1to1={handleZoom1to1} />
           <RotationControl rotation={rotation} onRotationChange={setRotation} />
-          <p className="mt-auto space-x-2 text-center text-xs text-muted-foreground md:text-sm">
+          <p className="mt-auto space-x-2 text-center text-sm text-muted-foreground">
             <span>
               Target: {variant.width}x{variant.height} px
             </span>
@@ -219,7 +224,10 @@ export function CropperWorkspace({
             )}
           </p>
         </div>
-        <div className="flex flex-col gap-3 border-t border-border/50 p-6">
+
+        <Separator />
+
+        <div className="flex flex-col gap-3">
           <Button
             onClick={handleSave}
             disabled={isProcessing || isPending}
@@ -252,7 +260,7 @@ export function CropperWorkspace({
             )
           )}
         </div>
-      </div>
+      </Panel>
     </div>
   );
 }
