@@ -1,8 +1,28 @@
 import { BackgroundDecorations } from "@/components/layout/BackgroundDecorations";
+import { Panel } from "@/components/ui/Panel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/Tooltip";
 import { GAMES } from "@/data/games";
+import { Crop, Gamepad2, ImagePlus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
+const STEPS = [
+  {
+    icon: Gamepad2,
+    title: "1. Choose a Preset",
+    description: "Select your RPG to automatically load the exact portrait dimensions needed.",
+  },
+  {
+    icon: ImagePlus,
+    title: "2. Import Artwork",
+    description: "Load your character art. Everything is processed locally in your browser.",
+  },
+  {
+    icon: Crop,
+    title: "3. Crop & Export",
+    description: "Frame your portraits and instantly download a ready-to-extract ZIP pack.",
+  },
+];
 
 export default function Home() {
   return (
@@ -18,6 +38,23 @@ export default function Home() {
             A local-first portrait preparation tool for RPGs and CRPGs. Prepare your character
             portraits with precision, completely in your browser.
           </p>
+        </div>
+
+        <div className="mb-24">
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
+            {STEPS.map((step, i) => (
+              <Panel
+                key={i}
+                className="items-center bg-card/40 p-8 text-center backdrop-blur supports-backdrop-filter:bg-card/20"
+              >
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
+                  <step.icon className="size-8" />
+                </div>
+                <h3 className="mb-3 font-display text-xl font-bold">{step.title}</h3>
+                <p className="text-muted-foreground">{step.description}</p>
+              </Panel>
+            ))}
+          </div>
         </div>
 
         <div className="mb-12">
