@@ -30,7 +30,7 @@ export default function Home() {
       <BackgroundDecorations />
 
       <div className="relative z-10 container mx-auto max-w-7xl px-4">
-        <div className="mb-24 flex flex-col items-center justify-center text-center">
+        <header className="mb-24 flex flex-col items-center justify-center text-center">
           <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary sm:text-5xl md:text-6xl lg:text-7xl">
             Crop & Quest
           </h1>
@@ -38,30 +38,38 @@ export default function Home() {
             A local-first portrait preparation tool for RPGs and CRPGs. Prepare your character
             portraits with precision, completely in your browser.
           </p>
-        </div>
+        </header>
 
-        <div className="mb-24">
+        <section aria-label="How it works" className="mb-24">
           <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
             {STEPS.map((step, i) => (
               <Panel
                 key={i}
+                asChild
                 className="items-center bg-card/40 p-8 text-center backdrop-blur supports-backdrop-filter:bg-card/20"
               >
-                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
-                  <step.icon className="size-8" />
-                </div>
-                <h3 className="mb-3 font-display text-xl font-bold">{step.title}</h3>
-                <p className="text-muted-foreground">{step.description}</p>
+                <article>
+                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
+                    <step.icon className="size-8" />
+                  </div>
+                  <h3 className="mb-3 font-display text-xl font-bold">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.description}</p>
+                </article>
               </Panel>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className="mb-12">
-          <h2 className="mb-8 text-center font-display text-3xl font-bold">Select a Preset</h2>
+        <section aria-labelledby="preset-selection-heading" className="mb-12">
+          <h2
+            id="preset-selection-heading"
+            className="mb-8 text-center font-display text-3xl font-bold"
+          >
+            Select a Preset
+          </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {GAMES.map((game) => (
-              <div key={game.id} className="relative aspect-video w-full">
+              <article key={game.id} className="relative aspect-video w-full">
                 <Link
                   href={`/create/${game.id}/select`}
                   className="group absolute top-0 left-0 z-10 flex w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-500 hover:z-20 hover:border-primary/50 hover:shadow-xl"
@@ -115,10 +123,10 @@ export default function Home() {
                     </div>
                   </div>
                 </Link>
-              </div>
+              </article>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

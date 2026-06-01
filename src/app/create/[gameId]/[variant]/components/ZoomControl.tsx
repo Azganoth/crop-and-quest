@@ -5,7 +5,6 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/InputGroup";
-import { Label } from "@/components/ui/Label";
 import { Slider } from "@/components/ui/Slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { ZoomIn, ZoomOut } from "lucide-react";
@@ -20,9 +19,11 @@ interface ZoomControlProps {
 
 export function ZoomControl({ zoom, onZoomChange, onZoom1to1 }: ZoomControlProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <fieldset className="m-0 flex flex-col gap-3 border-none p-0">
       <div className="flex items-center justify-between gap-2 px-1">
-        <Label>Zoom</Label>
+        <legend className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Zoom
+        </legend>
         <div className="flex items-center gap-1">
           {onZoom1to1 && (
             <Button variant="ghost" onClick={onZoom1to1}>
@@ -87,6 +88,6 @@ export function ZoomControl({ zoom, onZoomChange, onZoom1to1 }: ZoomControlProps
           <TooltipContent>Zoom In (+10%)</TooltipContent>
         </Tooltip>
       </div>
-    </div>
+    </fieldset>
   );
 }

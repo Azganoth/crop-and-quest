@@ -20,13 +20,13 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
   const params = useParams<{ gameId: string }>();
 
   return (
-    <div
+    <article
       className={cn(
         "flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all",
         isUniformMode ? "w-86" : "w-fit max-w-full min-w-70",
       )}
     >
-      <div
+      <figure
         className={cn(
           "group relative flex w-full items-center justify-center overflow-hidden bg-black/10",
           isUniformMode && "h-140",
@@ -76,7 +76,7 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
             </Button>
           </div>
         )}
-      </div>
+      </figure>
 
       <div className="flex flex-col gap-3 border-t border-border/50 p-4">
         <div className="flex items-start justify-between gap-2">
@@ -113,6 +113,6 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
           </div>
         )}
       </div>
-    </div>
+    </article>
   );
 }

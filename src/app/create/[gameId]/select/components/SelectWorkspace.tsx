@@ -62,7 +62,7 @@ export function SelectWorkspace({ game }: SelectWorkspaceProps) {
     }
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
 
     const uri = e.dataTransfer.getData("text/uri-list");
@@ -83,25 +83,31 @@ export function SelectWorkspace({ game }: SelectWorkspaceProps) {
   };
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center p-4">
+    <section
+      aria-label="Upload Artwork"
+      className="flex flex-1 flex-col items-center justify-center p-4"
+    >
       <Panel className="w-full max-w-xl items-center p-10 text-center">
-        <h1 className="font-display text-2xl font-bold text-primary">
-          Prepare a portrait for{" "}
-          <span className="capitalize underline decoration-primary/70 underline-offset-4">
-            {game.name}
-          </span>
-        </h1>
-        <p className="max-w-md text-muted-foreground">
-          Select the base artwork for your character. It will be used to generate all the required
-          portrait variants.
-        </p>
-        <div
+        <header>
+          <h1 className="font-display text-2xl font-bold text-primary">
+            Prepare a portrait for{" "}
+            <span className="capitalize underline decoration-primary/70 underline-offset-4">
+              {game.name}
+            </span>
+          </h1>
+          <p className="mt-2 max-w-md text-muted-foreground">
+            Select the base artwork for your character. It will be used to generate all the required
+            portrait variants.
+          </p>
+        </header>
+        <label
+          htmlFor="file-upload"
           className="group relative flex w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 bg-muted/20 py-16 transition-all hover:border-primary/50 hover:bg-muted/40"
-          onClick={() => fileInputRef.current?.click()}
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
           <input
+            id="file-upload"
             type="file"
             ref={fileInputRef}
             className="hidden"
@@ -117,7 +123,7 @@ export function SelectWorkspace({ game }: SelectWorkspaceProps) {
             <ImageIcon className="size-4" />
             <span>Supports PNG, JPEG, WEBP (Max 10MB)</span>
           </div>
-        </div>
+        </label>
 
         {error && (
           <div className="mt-6 w-full border border-destructive/30 bg-destructive/15 p-4 text-sm text-destructive">
@@ -125,6 +131,6 @@ export function SelectWorkspace({ game }: SelectWorkspaceProps) {
           </div>
         )}
       </Panel>
-    </div>
+    </section>
   );
 }

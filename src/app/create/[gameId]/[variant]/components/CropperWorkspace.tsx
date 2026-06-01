@@ -145,7 +145,10 @@ export function CropperWorkspace({
       : `/create/${game.id}/select`;
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden md:flex-row">
+    <section
+      aria-label="Crop Portrait"
+      className="relative flex flex-1 flex-col overflow-hidden md:flex-row"
+    >
       <div className="relative flex flex-1 items-center justify-center">
         <Cropper
           image={imageUrl}
@@ -162,87 +165,77 @@ export function CropperWorkspace({
           maxZoom={MAX_ZOOM}
         />
       </div>
-      <Panel className="z-20 w-full md:m-6 md:w-80 md:shrink-0 lg:w-96">
-        <div className="flex flex-col gap-6">
-          <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
-            {game.name}
-          </span>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" className="shrink-0" asChild>
-              <Link href={backHref} aria-label="Go back">
-                <ArrowLeft className="size-6" />
-              </Link>
-            </Button>
-            <h1 className="font-display text-xl font-bold text-primary capitalize md:text-2xl">
-              {variant.label}
-            </h1>
-          </div>
-          {!isSingleEdit && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-center text-sm font-medium tracking-wider text-muted-foreground uppercase">
-                Step {variantIndex + 1} of {totalVariants}
-              </div>
-              <div className="flex gap-1.5">
-                {Array.from({ length: totalVariants }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 flex-1 rounded-full transition-colors ${
-                      i < variantIndex
-                        ? "bg-primary/50"
-                        : i === variantIndex
-                          ? "bg-primary"
-                          : "bg-muted"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <Separator />
-
-        <div className="flex flex-1 flex-col gap-8">
-          <ZoomControl zoom={zoom} onZoomChange={setZoom} onZoom1to1={handleZoom1to1} />
-          <RotationControl rotation={rotation} onRotationChange={setRotation} />
-          <p className="mt-auto space-x-2 text-center text-sm text-muted-foreground">
-            <span>
-              Target: {variant.width}x{variant.height} px
+      <Panel asChild className="z-20 w-full md:m-6 md:w-80 md:shrink-0 lg:w-96">
+        <aside>
+          <header className="flex flex-col gap-6">
+            <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
+              {game.name}
             </span>
-            {imageResolution && (
-              <>
-                <span>•</span>
-                <span>
-                  Source: {imageResolution.width}x{imageResolution.height} px
-                </span>
-              </>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" size="icon" className="shrink-0" asChild>
+                <Link href={backHref} aria-label="Go back">
+                  <ArrowLeft className="size-6" />
+                </Link>
+              </Button>
+              <h1 className="font-display text-xl font-bold text-primary capitalize md:text-2xl">
+                {variant.label}
+              </h1>
+            </div>
+            {!isSingleEdit && (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-center text-sm font-medium tracking-wider text-muted-foreground uppercase">
+                  Step {variantIndex + 1} of {totalVariants}
+                </div>
+                <div className="flex gap-1.5">
+                  {Array.from({ length: totalVariants }).map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 flex-1 rounded-full transition-colors ${
+                        i < variantIndex
+                          ? "bg-primary/50"
+                          : i === variantIndex
+                            ? "bg-primary"
+                            : "bg-muted"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             )}
-          </p>
-        </div>
+          </header>
 
-        <Separator />
+          <Separator />
 
-        <div className="flex flex-col gap-3">
-          <Button
-            onClick={handleSave}
-            disabled={isProcessing || isPending}
-            size="lg"
-            className="w-full text-base"
-          >
-            {isProcessing || isPending ? "Processing..." : isSingleEdit ? "Save" : "Save & Next"}
-          </Button>
-          {isSingleEdit ? (
+          <div className="flex flex-1 flex-col gap-8">
+            <ZoomControl zoom={zoom} onZoomChange={setZoom} onZoom1to1={handleZoom1to1} />
+            <RotationControl rotation={rotation} onRotationChange={setRotation} />
+            <p className="mt-auto space-x-2 text-center text-sm text-muted-foreground">
+              <span>
+                Target: {variant.width}x{variant.height} px
+              </span>
+              {imageResolution && (
+                <>
+                  <span>•</span>
+                  <span>
+                    Source: {imageResolution.width}x{imageResolution.height} px
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
+
+          <Separator />
+
+          <nav aria-label="Cropper Actions" className="flex flex-col gap-3">
             <Button
-              variant="secondary"
-              size="lg"
-              onClick={handleSkip}
+              onClick={handleSave}
               disabled={isProcessing || isPending}
+              size="lg"
               className="w-full text-base"
             >
-              Cancel Edit
+              {isProcessing || isPending ? "Processing..." : isSingleEdit ? "Save" : "Save & Next"}
             </Button>
-          ) : (
-            variant.optional && (
+            {isSingleEdit ? (
               <Button
                 variant="secondary"
                 size="lg"
@@ -250,12 +243,24 @@ export function CropperWorkspace({
                 disabled={isProcessing || isPending}
                 className="w-full text-base"
               >
-                Skip Variant
+                Cancel Edit
               </Button>
-            )
-          )}
-        </div>
+            ) : (
+              variant.optional && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={handleSkip}
+                  disabled={isProcessing || isPending}
+                  className="w-full text-base"
+                >
+                  Skip Variant
+                </Button>
+              )
+            )}
+          </nav>
+        </aside>
       </Panel>
-    </div>
+    </section>
   );
 }

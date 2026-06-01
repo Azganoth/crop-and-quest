@@ -5,7 +5,6 @@ import {
   InputGroupInput,
   InputGroupText,
 } from "@/components/ui/InputGroup";
-import { Label } from "@/components/ui/Label";
 import { Slider } from "@/components/ui/Slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { RotateCcw, RotateCw } from "lucide-react";
@@ -17,9 +16,11 @@ interface RotationControlProps {
 
 export function RotationControl({ rotation, onRotationChange }: RotationControlProps) {
   return (
-    <div className="flex flex-col gap-3">
+    <fieldset className="m-0 flex flex-col gap-3 border-none p-0">
       <div className="flex items-center justify-between gap-2 px-1">
-        <Label>Rotation</Label>
+        <legend className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Rotation
+        </legend>
         <div className="flex items-center gap-1">
           <Button variant="ghost" onClick={() => onRotationChange(0)}>
             Reset
@@ -77,6 +78,6 @@ export function RotationControl({ rotation, onRotationChange }: RotationControlP
           <TooltipContent>Rotate Right (+5°)</TooltipContent>
         </Tooltip>
       </div>
-    </div>
+    </fieldset>
   );
 }

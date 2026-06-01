@@ -88,8 +88,11 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 pt-8 pb-20">
-      <div className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
+    <section
+      aria-label="Review and Export"
+      className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 pt-8 pb-20"
+    >
+      <header className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
         <div className="text-center md:text-left">
           <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
             Review Portraits
@@ -114,7 +117,7 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
             {isPending ? "Starting Over..." : "Start Over"}
           </Button>
         </div>
-      </div>
+      </header>
 
       <Separator className="my-3" />
 
@@ -183,6 +186,6 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
           </div>
         </Panel>
       )}
-    </div>
+    </section>
   );
 }
