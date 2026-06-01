@@ -84,7 +84,7 @@ export default function Home() {
                       className="object-cover brightness-40 transition-all duration-700 group-hover:scale-110 group-hover:brightness-[0.20]"
                     />
                     <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-                      <h3 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:-translate-y-2 group-hover:scale-105">
+                      <h3 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
                         {game.name}
                       </h3>
                     </div>
