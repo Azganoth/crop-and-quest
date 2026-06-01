@@ -51,31 +51,15 @@ export interface GamePreset {
 const OwlcatNotes = ({ path }: { path: string }) => (
   <>
     <p>
-      <strong>Option 1: In-Game Setup</strong>
+      Your downloaded ZIP contains a folder matching your requested portrait name. Extract this
+      entire folder directly into your game's portraits directory:
     </p>
-    <ul className="list-inside list-disc space-y-1">
+    <pre className="mt-2!">{path}</pre>
+    <ul className="mt-4 list-inside list-disc space-y-1">
       <li>
-        In the character creator, select <strong>Custom Portrait</strong> and click{" "}
-        <strong>Open portrait folder</strong>.
+        In the character creator, select <strong>Custom Portrait</strong>.
       </li>
-      <li>
-        The game will automatically generate a new numbered folder (e.g., <strong>0000</strong>,{" "}
-        <strong>0001</strong>).
-      </li>
-      <li>Replace the placeholder files inside this new folder with your downloaded PNGs.</li>
-    </ul>
-
-    <p className="mt-4">
-      <strong>Option 2: Manual Setup</strong>
-    </p>
-    <ul className="list-inside list-disc space-y-1">
-      <li>Navigate to the portraits directory:</li>
-      <pre className="mt-2!">{path}</pre>
-      <li>
-        Create a new numbered folder (e.g., <strong>0001</strong>, <strong>0002</strong>) matching
-        the expected sequence.
-      </li>
-      <li>Place your downloaded PNGs inside this specific folder.</li>
+      <li>Your new portrait will automatically appear in the selection list.</li>
     </ul>
   </>
 );
@@ -83,17 +67,14 @@ const OwlcatNotes = ({ path }: { path: string }) => (
 const InfinityEngineNotes = ({ path }: { path: string }) => (
   <>
     <p>
-      Extract your downloaded PNGs into the <strong>portraits</strong> folder within your Documents
-      directory (create the folder if it does not exist):
+      Your downloaded ZIP contains your portrait files, automatically named with the correct size
+      suffixes (e.g., <code>L</code>, <code>M</code>, <code>S</code>). Extract them directly into
+      the <strong>portraits</strong> folder within your Documents directory (create the folder if it
+      does not exist):
     </p>
     <pre>{path}</pre>
     <p>
       In-game, select the <strong>Custom</strong> button during character creation.
-    </p>
-    <p>
-      <strong>Note:</strong> You can rename the base files, but the base name cannot exceed 7
-      characters, and you must keep the <code>L</code>, <code>M</code>, or <code>S</code> size
-      suffix intact (e.g., <code>MYHEROL.bmp</code>).
     </p>
   </>
 );
@@ -109,8 +90,9 @@ const ShadowrunNotes = ({
 }) => (
   <>
     <p>
-      Navigate to the {pack} content pack portraits folder to replace an existing game portrait. You
-      must rename your files to exactly match the portrait filename you want to overwrite.
+      If you set your portrait name to match an existing NPC's filename, your downloaded files are
+      ready to use. Extract them into the {pack} content pack portraits folder to replace the
+      existing portrait.
     </p>
     <p>
       <strong>Steam:</strong>
@@ -126,15 +108,11 @@ const ShadowrunNotes = ({
 const ObsidianNotes = ({ path }: { path: string }) => (
   <>
     <p>
-      Extract your downloaded PNGs into the male or female portraits folder inside your game
-      installation.
+      Your downloaded ZIP contains your portrait files, automatically named with the correct size
+      suffixes (<code>_lg</code> and <code>_sm</code>). Extract them directly into the male or
+      female portraits folder inside your game installation:
     </p>
     <pre>{path}</pre>
-    <p>
-      <strong>Note:</strong> If adding multiple characters, you can rename the base files, but
-      ensure both variants share the same base name with the <code>_lg</code> and <code>_sm</code>{" "}
-      suffixes intact (e.g., <code>hero_lg.png</code> and <code>hero_sm.png</code>).
-    </p>
   </>
 );
 
@@ -473,17 +451,13 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <>
         <p>
-          Extract into the <strong>portraits</strong> folder inside your game installation
-          directory:
+          Your downloaded ZIP contains your portrait files, automatically named with the correct
+          size suffixes (<code>L</code> and <code>S</code>). Extract them into the{" "}
+          <strong>portraits</strong> folder inside your game installation directory:
         </p>
         <pre>&lt;Install Directory&gt;\Icewind Dale 2\portraits</pre>
         <p>
           In-game, select the <strong>Custom</strong> button during character creation.
-        </p>
-        <p>
-          <strong>Note:</strong> You can rename the base files, but the base name cannot exceed 7
-          characters, and you must keep the <code>L</code> or <code>S</code> size suffix intact
-          (e.g., <code>MYHEROL.bmp</code>).
         </p>
       </>
     ),
@@ -688,17 +662,16 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <>
         <p>
-          <strong>Enhanced Edition:</strong> Extract into your Documents folder:
+          Your downloaded ZIP contains your portrait files, automatically named with the correct
+          size suffixes (<code>L</code> and <code>S</code>).
+        </p>
+        <p>
+          <strong>Enhanced Edition:</strong> Extract them into your Documents folder:
         </p>
         <pre>Documents\Planescape Torment - Enhanced Edition\portraits</pre>
         <p>
-          <strong>Classic Version:</strong> Copy to the game installation directory's portraits
+          <strong>Classic Version:</strong> Copy them to the game installation directory's portraits
           folder.
-        </p>
-        <p>
-          <strong>Note:</strong> You can rename the base files, but the base name cannot exceed 7
-          characters, and you must keep the <code>L</code> or <code>S</code> size suffix intact
-          (e.g., <code>MYHEROL.bmp</code>).
         </p>
       </>
     ),
@@ -789,8 +762,9 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <>
         <p>
-          Extract into the <strong>portrait</strong> data folder within your game installation
-          directory:
+          Your downloaded ZIP contains your portrait files, automatically named with the correct
+          size suffixes. Extract them into the <strong>portrait</strong> data folder within your
+          game installation directory:
         </p>
         <pre>&lt;Install Directory&gt;\data\portrait</pre>
         <p>
@@ -828,18 +802,19 @@ export const GAMES: GamePreset[] = [
     installNotes: (
       <>
         <p>
-          Extract into the <strong>custom_portraits</strong> folder within your game installation
-          directory:
+          Extract your downloaded portrait file into the <strong>custom_portraits</strong> folder
+          within your game installation directory:
         </p>
         <pre>&lt;Install Directory&gt;\custom_portraits</pre>
         <p>
-          Your filename must begin with either <strong>male_</strong> or <strong>female_</strong>.
+          <strong>Note:</strong> You must ensure your Portrait Name begins with either{" "}
+          <strong>male_</strong> or <strong>female_</strong>.
         </p>
       </>
     ),
     exportConfig: {
       wrapInFolder: false,
-      defaultName: "custom_male",
+      defaultName: "male_custom",
     },
     variants: [
       {
