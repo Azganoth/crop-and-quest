@@ -10,13 +10,15 @@ import { Separator } from "@/components/ui/Separator";
 import { Switch } from "@/components/ui/Switch";
 import { Preset } from "@/data/presets";
 import { useMounted } from "@/hooks/useMounted";
+import { useValidation } from "@/hooks/useValidation";
 import { generatePresetZip } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useMemo, useState, useTransition } from "react";
+import * as v from "valibot";
 
 export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const router = useRouter();
@@ -42,6 +44,24 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
     };
   }, [zipBlobUrl]);
 
+  const schema = useMemo(() => {
+    return v.object({
+      portraitName: v.pipe(
+        v.string(),
+        v.regex(
+          /^[a-zA-Z0-9.\-_ ]*$/,
+          "Invalid characters (only letters, numbers, spaces, dots, dashes, and underscores)",
+        ),
+        v.maxLength(
+          preset.exportConfig.maxLength || 50,
+          `Max length is ${preset.exportConfig.maxLength || 50} characters`,
+        ),
+      ),
+    });
+  }, [preset.exportConfig.maxLength]);
+
+  const { errors, validate, clearError } = useValidation(schema);
+
   const safePortraitName = portraitName.trim() || preset.exportConfig.defaultName;
   const downloadName = `${preset.id}-portraits.zip`;
 
@@ -53,6 +73,11 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      return;
+    }
+
+    const isValid = validate({ portraitName });
+    if (!isValid) {
       return;
     }
 
@@ -91,7 +116,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
     >
       <header className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
         <div className="text-center md:text-left">
-          <h1 className="text-center font-display text-4xl font-bold md:text-5xl">
+          <h1 className="font-display text-2xl font-bold text-primary">
             Review {preset.name} Portraits
           </h1>
           <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
@@ -150,15 +175,18 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
               <Input
                 id="portrait-name"
                 value={portraitName}
-                onChange={(e) => setPortraitName(e.target.value)}
-                className="peer w-48 bg-background font-mono invalid:border-destructive invalid:ring-destructive/20"
-                pattern="^[a-zA-Z0-9.\-_ ]*$"
-                maxLength={preset.exportConfig.maxLength || 50}
-                title={`Only letters, numbers, spaces, dots, dashes, and underscores are allowed. Max length: ${preset.exportConfig.maxLength || 50} characters.`}
+                onChange={(e) => {
+                  setPortraitName(e.target.value);
+                  clearError("portraitName");
+                }}
+                className="w-48 bg-background font-mono"
+                aria-invalid={!!errors["portraitName"]}
+                placeholder={preset.exportConfig.defaultName}
               />
-              <FieldError className="absolute top-full mt-1 hidden text-[11px] font-medium whitespace-nowrap text-destructive peer-invalid:block">
-                Invalid characters
-              </FieldError>
+              <FieldError
+                className="absolute top-full mt-1 hidden text-[11px] whitespace-nowrap peer-aria-invalid:block"
+                errors={errors["portraitName"]}
+              />
             </div>
           </Field>
           <Button

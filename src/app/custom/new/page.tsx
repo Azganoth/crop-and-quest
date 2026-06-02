@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Field, FieldLabel } from "@/components/ui/Field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Panel } from "@/components/ui/Panel";
 import {
@@ -14,16 +14,41 @@ import {
 import { Switch } from "@/components/ui/Switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { PortraitVariant, Preset } from "@/data/presets";
+import { useValidation } from "@/hooks/useValidation";
 import { getAspectRatioString } from "@/lib/math";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import * as v from "valibot";
+
+const presetSchema = v.object({
+  name: v.pipe(v.string(), v.minLength(1, "Preset name is required")),
+  variants: v.pipe(
+    v.array(
+      v.object({
+        label: v.pipe(v.string(), v.minLength(1, "Label is required")),
+        width: v.pipe(
+          v.union([v.number(), v.string()]),
+          v.transform(Number),
+          v.minValue(1, "Must be > 0"),
+        ),
+        height: v.pipe(
+          v.union([v.number(), v.string()]),
+          v.transform(Number),
+          v.minValue(1, "Must be > 0"),
+        ),
+      }),
+    ),
+    v.minLength(1, "At least one variant is required"),
+  ),
+});
 
 export default function CreateCustomPresetPage() {
   const router = useRouter();
   const { addCustomPreset } = useCustomPresetsStore();
+  const { errors, validate, clearError } = useValidation(presetSchema);
 
   const [name, setName] = useState("");
   const [defaultName, setDefaultName] = useState("custom_portrait");
@@ -62,13 +87,17 @@ export default function CreateCustomPresetPage() {
       },
       ...variants,
     ]);
+    clearError("variants");
   };
 
-  const handleRemoveVariant = (id: string) => {
+  const handleRemoveVariant = (index: number, id: string) => {
     setVariants(variants.filter((v) => v.id !== id));
+    clearError(`variants.${index}.label`);
+    clearError(`variants.${index}.width`);
+    clearError(`variants.${index}.height`);
   };
 
-  const updateVariant = (id: string, field: string, value: string | number) => {
+  const updateVariant = (index: number, id: string, field: string, value: string | number) => {
     setVariants(
       variants.map((v) => {
         if (v.id === id) {
@@ -77,26 +106,15 @@ export default function CreateCustomPresetPage() {
         return v;
       }),
     );
+    clearError(`variants.${index}.${field}`);
   };
 
   const handleSave = (e: React.SubmitEvent) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      alert("Preset name is required.");
+    const isValid = validate({ name: name.trim(), variants });
+    if (!isValid) {
       return;
-    }
-
-    if (variants.length === 0) {
-      alert("At least one variant is required.");
-      return;
-    }
-
-    for (const v of variants) {
-      if (!v.label.trim() || !v.width || !v.height) {
-        alert("All variants must have a label, width, and height.");
-        return;
-      }
     }
 
     const presetId = `custom-${crypto.randomUUID()}`;
@@ -145,7 +163,7 @@ export default function CreateCustomPresetPage() {
         </p>
       </header>
 
-      <form onSubmit={handleSave} className="flex flex-col gap-8">
+      <form onSubmit={handleSave} className="flex flex-col gap-8" noValidate>
         <Panel asChild className="flex flex-col gap-6">
           <section>
             <h2 className="font-display text-xl font-bold">General Settings</h2>
@@ -155,10 +173,14 @@ export default function CreateCustomPresetPage() {
                 <Input
                   id="preset-name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    clearError("name");
+                  }}
                   placeholder="e.g. Arcanum"
-                  required
+                  aria-invalid={!!errors["name"]}
                 />
+                <FieldError errors={errors["name"]} />
               </Field>
 
               <Field>
@@ -203,7 +225,12 @@ export default function CreateCustomPresetPage() {
         <Panel asChild className="flex flex-col gap-6">
           <section>
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold">Portrait Variants</h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="font-display text-xl font-bold">Portrait Variants</h2>
+                {errors["variants"] && (
+                  <span className="text-sm font-medium text-destructive">{errors["variants"]}</span>
+                )}
+              </div>
               <Button type="button" variant="outline" size="sm" onClick={handleAddVariant}>
                 <Plus className="mr-1 size-5" />
                 Add Variant
@@ -247,7 +274,7 @@ export default function CreateCustomPresetPage() {
                         variant="ghost"
                         size="icon"
                         className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => handleRemoveVariant(variant.id)}
+                        onClick={() => handleRemoveVariant(index, variant.id)}
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -260,10 +287,11 @@ export default function CreateCustomPresetPage() {
                       <Input
                         id={`label-${variant.id}`}
                         value={variant.label}
-                        onChange={(e) => updateVariant(variant.id, "label", e.target.value)}
+                        onChange={(e) => updateVariant(index, variant.id, "label", e.target.value)}
                         placeholder="e.g. Large Portrait"
-                        required
+                        aria-invalid={!!errors[`variants.${index}.label`]}
                       />
+                      <FieldError errors={errors[`variants.${index}.label`]} />
                     </Field>
 
                     <Field>
@@ -272,11 +300,12 @@ export default function CreateCustomPresetPage() {
                         id={`width-${variant.id}`}
                         type="number"
                         value={variant.width}
-                        onChange={(e) => updateVariant(variant.id, "width", e.target.value)}
+                        onChange={(e) => updateVariant(index, variant.id, "width", e.target.value)}
                         placeholder="256"
-                        required
                         min={1}
+                        aria-invalid={!!errors[`variants.${index}.width`]}
                       />
+                      <FieldError errors={errors[`variants.${index}.width`]} />
                     </Field>
 
                     <Field>
@@ -285,18 +314,19 @@ export default function CreateCustomPresetPage() {
                         id={`height-${variant.id}`}
                         type="number"
                         value={variant.height}
-                        onChange={(e) => updateVariant(variant.id, "height", e.target.value)}
+                        onChange={(e) => updateVariant(index, variant.id, "height", e.target.value)}
                         placeholder="256"
-                        required
                         min={1}
+                        aria-invalid={!!errors[`variants.${index}.height`]}
                       />
+                      <FieldError errors={errors[`variants.${index}.height`]} />
                     </Field>
 
                     <Field>
                       <FieldLabel htmlFor={`format-${variant.id}`}>Format</FieldLabel>
                       <Select
                         value={variant.format}
-                        onValueChange={(val) => updateVariant(variant.id, "format", val)}
+                        onValueChange={(val) => updateVariant(index, variant.id, "format", val)}
                       >
                         <SelectTrigger id={`format-${variant.id}`}>
                           <SelectValue />
@@ -318,8 +348,10 @@ export default function CreateCustomPresetPage() {
                       <Input
                         id={`suffix-${variant.id}`}
                         value={variant.filename}
-                        onChange={(e) => updateVariant(variant.id, "filename", e.target.value)}
-                        placeholder="e.g. _L (appends to default name)"
+                        onChange={(e) =>
+                          updateVariant(index, variant.id, "filename", e.target.value)
+                        }
+                        placeholder="e.g. _L (appends to portrait name)"
                       />
                     </Field>
                   </div>
