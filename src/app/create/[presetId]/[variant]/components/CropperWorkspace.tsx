@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
-import type { GamePreset, PortraitVariant } from "@/data/games";
+import type { Preset, PortraitVariant } from "@/data/presets";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { exportCroppedImage } from "@/lib/canvas";
 import { ArrowLeft } from "lucide-react";
@@ -15,7 +15,7 @@ import { RotationControl } from "./RotationControl";
 import { MAX_ZOOM, ZoomControl } from "./ZoomControl";
 
 interface CropperWorkspaceProps {
-  game: GamePreset;
+  preset: Preset;
   variant: PortraitVariant;
   variantIndex: number;
   totalVariants: number;
@@ -26,7 +26,7 @@ interface CropperWorkspaceProps {
 }
 
 export function CropperWorkspace({
-  game,
+  preset,
   variant,
   variantIndex,
   totalVariants,
@@ -109,11 +109,11 @@ export function CropperWorkspace({
 
       startTransition(() => {
         if (isSingleEdit) {
-          router.push(`/create/${game.id}/review`);
+          router.push(`/create/${preset.id}/review`);
         } else if (nextVariant) {
-          router.push(`/create/${game.id}/${nextVariant.key}`);
+          router.push(`/create/${preset.id}/${nextVariant.key}`);
         } else {
-          router.push(`/create/${game.id}/review`);
+          router.push(`/create/${preset.id}/review`);
         }
       });
     } catch (e) {
@@ -127,22 +127,22 @@ export function CropperWorkspace({
   const handleSkip = () => {
     startTransition(() => {
       if (isSingleEdit) {
-        router.push(`/create/${game.id}/review`);
+        router.push(`/create/${preset.id}/review`);
       } else if (nextVariant) {
-        router.push(`/create/${game.id}/${nextVariant.key}`);
+        router.push(`/create/${preset.id}/${nextVariant.key}`);
       } else {
-        router.push(`/create/${game.id}/review`);
+        router.push(`/create/${preset.id}/review`);
       }
     });
   };
 
   const aspect = variant.width / variant.height;
-  const previousVariant = variantIndex > 0 ? game.variants[variantIndex - 1] : undefined;
+  const previousVariant = variantIndex > 0 ? preset.variants[variantIndex - 1] : undefined;
   const backHref = isSingleEdit
-    ? `/create/${game.id}/review`
+    ? `/create/${preset.id}/review`
     : previousVariant
-      ? `/create/${game.id}/${previousVariant.key}`
-      : `/create/${game.id}/select`;
+      ? `/create/${preset.id}/${previousVariant.key}`
+      : `/create/${preset.id}/select`;
 
   return (
     <section
@@ -169,7 +169,7 @@ export function CropperWorkspace({
         <aside>
           <header className="flex flex-col gap-6">
             <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
-              {game.name}
+              {preset.name}
             </span>
             <div className="flex items-center gap-4">
               <Button variant="outline" size="icon" className="shrink-0" asChild>

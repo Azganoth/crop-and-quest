@@ -33,11 +33,11 @@ export interface PortraitVariant {
   optional?: boolean;
 }
 
-export interface GamePreset {
+export interface Preset {
   id: string;
   name: string;
   description?: string;
-  cover: StaticImageData;
+  cover?: StaticImageData;
   exportConfig: {
     wrapInFolder: boolean;
     defaultName: string;
@@ -116,7 +116,7 @@ const ObsidianNotes = ({ path }: { path: string }) => (
   </>
 );
 
-export const GAMES: GamePreset[] = [
+export const PRESETS: Preset[] = [
   {
     id: "pathfinder-kingmaker",
     name: "Pathfinder: Kingmaker",

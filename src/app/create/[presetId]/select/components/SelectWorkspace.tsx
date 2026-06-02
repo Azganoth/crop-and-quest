@@ -1,7 +1,7 @@
 "use client";
 
 import { Panel } from "@/components/ui/Panel";
-import { GamePreset } from "@/data/games";
+import { Preset } from "@/data/presets";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { Image as ImageIcon, ImagePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -10,15 +10,15 @@ import { useRef, useState } from "react";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface SelectWorkspaceProps {
-  game: GamePreset;
+  preset: Preset;
 }
 
-export function SelectWorkspace({ game }: SelectWorkspaceProps) {
+export function SelectWorkspace({ preset }: SelectWorkspaceProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { setImage, setGameId } = usePortraitStore();
+  const { setPresetId, setImage } = usePortraitStore();
 
   const handleFile = (file: File | undefined | null) => {
     setError(null);
@@ -53,12 +53,12 @@ export function SelectWorkspace({ game }: SelectWorkspaceProps) {
       return;
     }
 
-    setGameId(game.id);
+    setPresetId(preset.id);
     setImage(file);
 
-    if (game.variants.length > 0) {
-      const firstVariant = game.variants[0].key;
-      router.push(`/create/${game.id}/${firstVariant}`);
+    if (preset.variants.length > 0) {
+      const firstVariant = preset.variants[0].key;
+      router.push(`/create/${preset.id}/${firstVariant}`);
     }
   };
 
@@ -92,7 +92,7 @@ export function SelectWorkspace({ game }: SelectWorkspaceProps) {
           <h1 className="font-display text-2xl font-bold text-primary">
             Prepare a portrait for{" "}
             <span className="capitalize underline decoration-primary/70 underline-offset-4">
-              {game.name}
+              {preset.name}
             </span>
           </h1>
           <p className="mt-2 max-w-md text-muted-foreground">

@@ -1,10 +1,7 @@
 import { BackgroundDecorations } from "@/components/layout/BackgroundDecorations";
 import { Panel } from "@/components/ui/Panel";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/Tooltip";
-import { GAMES } from "@/data/games";
+import { PresetGrid } from "@/app/components/PresetGrid";
 import { Crop, Gamepad2, ImagePlus } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 
 const STEPS = [
   {
@@ -67,65 +64,7 @@ export default function Home() {
           >
             Select a Preset
           </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {GAMES.map((game) => (
-              <article key={game.id} className="relative aspect-video w-full">
-                <Link
-                  href={`/create/${game.id}/select`}
-                  className="group absolute top-0 left-0 z-10 flex w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-500 hover:z-20 hover:border-primary/50 hover:shadow-xl"
-                >
-                  <div className="relative aspect-video w-full">
-                    <Image
-                      src={game.cover}
-                      alt={`${game.name} cover`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      placeholder="blur"
-                      className="object-cover brightness-40 transition-all duration-700 group-hover:scale-110 group-hover:brightness-[0.20]"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-                      <h3 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
-                        {game.name}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-rows-[0fr] bg-card transition-all duration-500 group-hover:grid-rows-[1fr]">
-                    <div className="overflow-hidden">
-                      <div className="flex flex-col px-4 pb-4">
-                        <p className="mt-4 mb-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">
-                          Variants
-                        </p>
-                        <div className="flex w-full items-end justify-center gap-3">
-                          <TooltipProvider delayDuration={100}>
-                            {game.variants.map((v) => (
-                              <Tooltip key={v.key}>
-                                <TooltipTrigger asChild>
-                                  <div
-                                    className="rounded-sm border border-border bg-secondary shadow-md"
-                                    style={{
-                                      aspectRatio: `${v.width} / ${v.height}`,
-                                      height: "48px",
-                                    }}
-                                  />
-                                </TooltipTrigger>
-                                <TooltipContent sideOffset={12} side="bottom">
-                                  <span className="font-semibold capitalize">{v.key}</span>
-                                  <span className="ml-2 font-medium text-muted-foreground">
-                                    {v.width}x{v.height}
-                                  </span>
-                                </TooltipContent>
-                              </Tooltip>
-                            ))}
-                          </TooltipProvider>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </article>
-            ))}
-          </div>
+          <PresetGrid />
         </section>
       </div>
     </div>

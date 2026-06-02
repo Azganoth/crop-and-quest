@@ -1,15 +1,15 @@
-import { GamePreset } from "@/data/games";
+import { Preset } from "@/data/presets";
 import { CropState } from "@/store/usePortraitStore";
 import JSZip from "jszip";
 
-export async function generateGameZip(
-  game: GamePreset,
+export async function generatePresetZip(
+  preset: Preset,
   crops: Record<string, CropState | undefined>,
   portraitName: string,
 ): Promise<Blob> {
   const zip = new JSZip();
 
-  const fetchPromises = game.variants.map(async (variant) => {
+  const fetchPromises = preset.variants.map(async (variant) => {
     const crop = crops[variant.key];
     if (!crop || !crop.croppedBlobUrl) {
       if (!variant.optional) {
@@ -38,11 +38,11 @@ export async function generateGameZip(
     if (result.value) {
       const { variant, blob } = result.value;
       const safePortraitName =
-        portraitName.replace(/[^a-zA-Z0-9.\-_ ]/g, "").trim() || game.exportConfig.defaultName;
+        portraitName.replace(/[^a-zA-Z0-9.\-_ ]/g, "").trim() || preset.exportConfig.defaultName;
       let finalFilename = variant.filename.replace("{name}", safePortraitName);
       finalFilename = finalFilename.replace(/[^a-zA-Z0-9.\-_]/g, "");
 
-      const zipPath = game.exportConfig.wrapInFolder
+      const zipPath = preset.exportConfig.wrapInFolder
         ? `${safePortraitName}/${finalFilename}`
         : finalFilename;
       zip.file(zipPath, blob);

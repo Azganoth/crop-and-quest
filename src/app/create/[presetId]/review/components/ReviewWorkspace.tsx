@@ -8,25 +8,22 @@ import { Label } from "@/components/ui/Label";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
 import { Switch } from "@/components/ui/Switch";
-import type { GamePreset } from "@/data/games";
+import { Preset } from "@/data/presets";
 import { useMounted } from "@/hooks/useMounted";
-import { generateGameZip } from "@/lib/export";
+import { generatePresetZip } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState, useTransition } from "react";
 
-interface ReviewWorkspaceProps {
-  game: GamePreset;
-}
-
-export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
+export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const router = useRouter();
 
   const { crops, clearSession } = usePortraitStore();
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
-  const [portraitName, setPortraitName] = useState(game.exportConfig.defaultName);
+  const [portraitName, setPortraitName] = useState(preset.exportConfig.defaultName);
   const [isPending, startTransition] = useTransition();
   const { isUniformMode, setUniformMode } = useSettingsStore();
   const isMounted = useMounted();
@@ -45,8 +42,8 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
     };
   }, [zipBlobUrl]);
 
-  const safePortraitName = portraitName.trim() || game.exportConfig.defaultName;
-  const downloadName = `${game.id}-portraits.zip`;
+  const safePortraitName = portraitName.trim() || preset.exportConfig.defaultName;
+  const downloadName = `${preset.id}-portraits.zip`;
 
   const [, formAction, isExporting] = useActionState(async () => {
     if (zipBlobUrl) {
@@ -60,7 +57,7 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
     }
 
     try {
-      const zipBlob = await generateGameZip(game, crops, safePortraitName);
+      const zipBlob = await generatePresetZip(preset, crops, safePortraitName);
       const url = URL.createObjectURL(zipBlob);
       setZipBlobUrl(url);
 
@@ -83,7 +80,7 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
   const handleStartOver = () => {
     startTransition(() => {
       clearSession();
-      router.push(`/create/${game.id}/select`);
+      router.push(`/create/${preset.id}/select`);
     });
   };
 
@@ -94,11 +91,11 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
     >
       <header className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
         <div className="text-center md:text-left">
-          <h1 className="font-display text-2xl font-bold text-primary capitalize md:text-3xl">
-            Review Portraits
+          <h1 className="text-center font-display text-4xl font-bold md:text-5xl">
+            Review {preset.name} Portraits
           </h1>
-          <p className="text-sm font-bold tracking-widest text-muted-foreground uppercase">
-            {game.name}
+          <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+            {Object.keys(crops).length} of {preset.variants.length} completed
           </p>
         </div>
 
@@ -122,15 +119,21 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
       <Separator className="my-3" />
 
       <div className="flex flex-wrap items-start justify-center gap-8">
-        {game.variants
+        {preset.variants
           .toSorted((a, b) => a.height - b.height)
           .map((variant) => (
-            <PortraitPreviewCard
+            <Link
               key={variant.key}
-              variant={variant}
-              crop={crops[variant.key]}
-              isUniformMode={isUniformMode}
-            />
+              href={`/create/${preset.id}/${variant.key}?singleEdit=true`}
+              passHref
+              legacyBehavior
+            >
+              <PortraitPreviewCard
+                variant={variant}
+                crop={crops[variant.key]}
+                isUniformMode={isUniformMode}
+              />
+            </Link>
           ))}
       </div>
 
@@ -150,8 +153,8 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
                 onChange={(e) => setPortraitName(e.target.value)}
                 className="peer w-48 bg-background font-mono invalid:border-destructive invalid:ring-destructive/20"
                 pattern="^[a-zA-Z0-9.\-_ ]*$"
-                maxLength={game.exportConfig.maxLength || 50}
-                title={`Only letters, numbers, spaces, dots, dashes, and underscores are allowed. Max length: ${game.exportConfig.maxLength || 50} characters.`}
+                maxLength={preset.exportConfig.maxLength || 50}
+                title={`Only letters, numbers, spaces, dots, dashes, and underscores are allowed. Max length: ${preset.exportConfig.maxLength || 50} characters.`}
               />
               <FieldError className="absolute top-full mt-1 hidden text-[11px] font-medium whitespace-nowrap text-destructive peer-invalid:block">
                 Invalid characters
@@ -160,7 +163,7 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
           </Field>
           <Button
             type="submit"
-            disabled={isExporting || isPending}
+            disabled={isExporting || Object.keys(crops).length !== preset.variants.length}
             size="lg"
             className="w-full shadow-lg md:w-auto"
           >
@@ -178,11 +181,11 @@ export function ReviewWorkspace({ game }: ReviewWorkspaceProps) {
 
       <Separator className="my-12" />
 
-      {game.installNotes && (
+      {preset.installNotes && (
         <Panel className="mx-auto w-full max-w-4xl">
           <h2 className="font-display text-lg font-bold text-foreground">Installation Notes</h2>
           <div className="flex flex-col gap-2 [&_p]:leading-relaxed [&_pre]:mt-1 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:border [&_pre]:border-border/50 [&_pre]:bg-background/80 [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-sm [&_pre]:break-all [&_pre]:whitespace-pre-wrap [&_pre]:text-muted-foreground [&_strong]:text-foreground">
-            {game.installNotes}
+            {preset.installNotes}
           </div>
         </Panel>
       )}

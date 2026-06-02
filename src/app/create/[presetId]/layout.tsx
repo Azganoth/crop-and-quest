@@ -1,5 +1,5 @@
-import { SessionProtector } from "@/app/create/[gameId]/components/SessionProtector";
-import { GAMES } from "@/data/games";
+import { SessionProtector } from "@/app/create/[presetId]/components/SessionProtector";
+import { PRESETS } from "@/data/presets";
 import Image from "next/image";
 import { ReactNode } from "react";
 
@@ -8,18 +8,18 @@ export default async function EditorLayout({
   params,
 }: {
   children: ReactNode;
-  params: Promise<{ gameId: string }>;
+  params: Promise<{ presetId: string }>;
 }) {
-  const { gameId } = await params;
-  const game = GAMES.find((g) => g.id === gameId);
+  const { presetId } = await params;
+  const preset = PRESETS.find((g) => g.id === presetId);
 
   return (
     <div className="relative flex flex-1 flex-col">
       <SessionProtector />
-      {game && (
+      {preset?.cover && (
         <div className="pointer-events-none fixed inset-0 z-[-1] overflow-hidden">
           <Image
-            src={game.cover}
+            src={preset.cover}
             alt="Background cover"
             fill
             sizes="100vw"

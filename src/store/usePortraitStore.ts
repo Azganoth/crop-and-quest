@@ -17,24 +17,24 @@ export interface CropState {
 export type CropStateMap = Record<string, CropState>;
 
 export interface PortraitSession {
-  gameId: string;
+  presetId: string;
   imageFile: File | null;
   imageUrl: string | null;
   crops: Partial<CropStateMap>;
 
-  setGameId: (id: string) => void;
+  setPresetId: (id: string) => void;
   setImage: (file: File) => void;
   setCrop: (variantKey: string, crop: CropState) => void;
   clearSession: () => void;
 }
 
 export const usePortraitStore = create<PortraitSession>((set, get) => ({
-  gameId: "",
+  presetId: "",
   imageFile: null,
   imageUrl: null,
   crops: {},
 
-  setGameId: (id) => set({ gameId: id }),
+  setPresetId: (id) => set({ presetId: id }),
 
   setImage: (file) => {
     const currentUrl = get().imageUrl;
@@ -77,7 +77,7 @@ export const usePortraitStore = create<PortraitSession>((set, get) => ({
     });
 
     set({
-      gameId: "",
+      presetId: "",
       imageFile: null,
       imageUrl: null,
       crops: {},
