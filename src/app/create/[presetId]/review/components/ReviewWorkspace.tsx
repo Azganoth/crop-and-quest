@@ -1,6 +1,15 @@
 "use client";
 
 import { PortraitPreviewCard } from "@/app/create/components/PortraitPreviewCard";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -25,6 +34,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
 
   const { crops, clearSession } = usePortraitStore();
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [portraitName, setPortraitName] = useState(preset.exportConfig.defaultName);
   const [isPending, startTransition] = useTransition();
   const { isUniformMode, setUniformMode } = useSettingsStore();
@@ -98,7 +108,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
         error instanceof Error
           ? error.message
           : "Failed to generate ZIP file. Please download individual files instead.";
-      alert(msg);
+      setErrorMsg(msg);
     }
   }, null);
 
@@ -185,7 +195,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
               />
               <FieldError
                 className="absolute top-full mt-1 hidden text-[11px] whitespace-nowrap peer-aria-invalid:block"
-                errors={errors["portraitName"]}
+                error={errors["portraitName"]}
               />
             </div>
           </Field>
@@ -217,6 +227,18 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           </div>
         </Panel>
       )}
+
+      <AlertDialog open={!!errorMsg} onOpenChange={(open) => !open && setErrorMsg(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Export Failed</AlertDialogTitle>
+            <AlertDialogDescription>{errorMsg}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setErrorMsg(null)}>Close</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
