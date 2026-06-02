@@ -17,7 +17,7 @@ Crop & Quest is a local-first portrait preparation tool for RPGs and CRPGs. The 
 
 ```mermaid
 flowchart TD
-    S[Select Game Preset] --> A[Select Image]
+    S[Select Preset] --> A[Select Image]
     A --> B[Crop Required Variants]
     B --> C[Review Generated Portraits]
     C --> D[Export Individual Files or ZIP]
@@ -53,20 +53,21 @@ flowchart TD
 
 ```txt
 /                         Home
-/create/[gameId]/select   Select source image
-/create/[gameId]/[variant] Crop a specific portrait variant
-/create/[gameId]/review   Review and export
+/create/[presetId]/select Select source image
+/create/[presetId]/[variant] Crop a specific portrait variant
+/create/[presetId]/review Review and export
+/custom/new               Create a custom preset
 /support                  Donation and support information
 ```
 
-Editor routes share one portrait session through the editor layout. If a user visits a crop or review route without an image, redirect to that game's select step. Users navigate between variants sequentially, but must complete all non-optional variants to unlock global export.
+Editor routes share one portrait session through the editor layout. If a user visits a crop or review route without an image, redirect to that preset's select step. Users navigate between variants sequentially, but must complete all non-optional variants to unlock global export.
 
 ### Error Scenarios & UX
 
 The UI should handle edge cases with clear, actionable, and recoverable feedback written for non-technical users:
 
 - **Invalid file type / unreadable image:** Show an error and prompt for a valid PNG, JPEG, or WebP. Explicitly validate against 0-byte files, and actively catch image `onerror` decode failures to surface a "Corrupted image data" error.
-- **Missing image mid-session:** Redirect user back to the `/create/[gameId]/select` step.
+- **Missing image mid-session:** Redirect user back to the `/create/[presetId]/select` step.
 - **Incomplete required crops:** Disable ZIP Export and highlight missing variants on the review screen.
 - **Failed canvas export:** Display an error and suggest trying a smaller image. Object URLs must be immediately revoked upon encountering an error to prevent memory leaks before prompting the user to retry.
 - **Failed ZIP generation (Memory Limits):** If ZIP generation fails (e.g., OOM on mobile), recommend the user download the individual files instead.
@@ -76,7 +77,7 @@ The UI should handle edge cases with clear, actionable, and recoverable feedback
 
 ### Tech Stack & Project Structure
 
-The application uses Next.js, React, TypeScript, Tailwind CSS, Zustand, [react-easy-crop](https://github.com/ricardo-ch/react-easy-crop), and [JSZip](https://stuk.github.io/jszip/).
+The application uses Next.js, React, TypeScript, Tailwind CSS, Zustand, Valibot, [react-easy-crop](https://github.com/ricardo-ch/react-easy-crop), and [JSZip](https://stuk.github.io/jszip/).
 
 **Prerequisites:** Refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for required Node version and package manager details.
 
@@ -104,7 +105,7 @@ src/types/                       shared cross-feature types
 
 ### Editor Session State
 
-The editor session is ephemeral and client-side. If the user refreshes the page and the `imageFile` state is lost, the editor routes must gracefully catch this and redirect the user back to the `/create/[gameId]/select` step. Navigating to a new `/create/[gameId]/select` route must completely clear the previous `PortraitSession` to prevent state leakage between game presets.
+The editor session is ephemeral and client-side. If the user refreshes the page and the `imageFile` state is lost, the editor routes must gracefully catch this and redirect the user back to the `/create/[presetId]/select` step. Navigating to a new `/create/[presetId]/select` route must completely clear the previous `PortraitSession` to prevent state leakage between game presets.
 
 Use Zustand for portrait editor session state. Because `imageFile` (File object) is non-serializable, avoid using Zustand DevTools or persistence middlewares for this slice to prevent runtime errors. Do not persist raw user image data by default.
 
@@ -112,10 +113,10 @@ Use Zustand for portrait editor session state. Because `imageFile` (File object)
 export type CropStateMap = Record<string, CropState>;
 
 export interface PortraitSession {
-  gameId: string;
+  presetId: string;
   imageFile: File | null;
   imageUrl: string | null;
-  // Keys must correspond exactly to the 'key' strings defined in the current GamePreset's variants array
+  // Keys must correspond exactly to the 'key' strings defined in the current Preset's variants array
   crops: Partial<CropStateMap>;
 }
 
@@ -138,12 +139,18 @@ export interface CropState {
 Game presets define dimensions, aspect ratios, filenames, and game-specific notes. Presets should be plain TypeScript data that can be imported from server or client components. Note that both `key` and `filename` values inside the `variants` array must be strictly unique within a single preset to prevent state overwrites and ZIP file collisions.
 
 ```ts
-export interface GamePreset {
+export interface Preset {
   id: string;
   name: string;
-  cover: StaticImageData;
+  description?: string;
+  cover?: StaticImageData;
+  exportConfig: {
+    wrapInFolder: boolean;
+    defaultName: string;
+    maxLength?: number;
+  };
   variants: PortraitVariant[];
-  installNotes?: string;
+  installNotes?: React.ReactNode;
   sourceUrl?: string;
 }
 
@@ -162,9 +169,13 @@ export interface PortraitVariant {
 Example:
 
 ```ts
-export const pathfinderKingmakerPreset: GamePreset = {
+export const pathfinderKingmakerPreset: Preset = {
   id: "pathfinder-kingmaker",
   name: "Pathfinder: Kingmaker",
+  exportConfig: {
+    wrapInFolder: true,
+    defaultName: "0001",
+  },
   variants: [
     {
       key: "large",
@@ -207,8 +218,6 @@ The application should not require:
 
 ## Backlog
 
-- Custom potrait naming
-- Custom/free mode for unsupported games
-- Custom preset builder
 - Batch portrait creation
+- Support multiple portrait assignments from a single image batch
 - Optional portrait reference links for supported games
