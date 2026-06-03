@@ -19,10 +19,12 @@ pnpm install
 ## Commands
 
 ```bash
-pnpm dev      # start the development server
-pnpm build    # create a production build
-pnpm lint     # run oxlint
-pnpm fmt      # run oxfmt
+pnpm dev       # start the development server
+pnpm build     # create a production build
+pnpm lint      # run oxlint for fast syntax checking
+pnpm typecheck # run typescript compiler for strict type checking
+pnpm check     # run both lint and typecheck
+pnpm fmt       # run oxfmt for code formatting
 ```
 
 ## Project Guidance
