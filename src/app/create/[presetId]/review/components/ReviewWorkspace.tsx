@@ -195,7 +195,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
               />
               <FieldError
                 className="absolute top-full mt-1 hidden text-[11px] whitespace-nowrap peer-aria-invalid:block"
-                error={errors["portraitName"]}
+                errors={errors["portraitName"]}
               />
             </div>
           </Field>

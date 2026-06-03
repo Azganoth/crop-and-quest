@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot } from "radix-ui";
 import { ComponentProps } from "react";
 
 export interface PanelProps extends ComponentProps<"div"> {
