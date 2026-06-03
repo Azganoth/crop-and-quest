@@ -7,7 +7,7 @@ export interface PanelProps extends ComponentProps<"div"> {
 }
 
 export function Panel({ className, asChild = false, ...props }: PanelProps) {
-  const Comp = asChild ? Slot : "div";
+  const Comp = asChild ? Slot.Root : "div";
 
   return (
     <Comp
