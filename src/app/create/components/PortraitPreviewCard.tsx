@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/Button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import type { PortraitVariant } from "@/data/presets";
 import { cn } from "@/lib/cn";
 import { triggerDownload } from "@/lib/export";
@@ -27,17 +26,21 @@ export function PortraitPreviewCard({
     <article
       className={cn(
         "flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all",
-        isUniformMode ? "w-86" : "w-fit max-w-full min-w-70",
+        isUniformMode ? "w-85" : "w-fit max-w-full min-w-70",
       )}
     >
       <figure
         className={cn(
           "group relative flex w-full items-center justify-center overflow-hidden bg-black/10",
-          isUniformMode && "h-140",
+          isUniformMode && "h-80",
         )}
-        style={{
-          aspectRatio: `${variant.width} / ${variant.height}`,
-        }}
+        style={
+          isUniformMode
+            ? undefined
+            : {
+                aspectRatio: `${variant.width} / ${variant.height}`,
+              }
+        }
       >
         <div className="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]" />
         {hasCrop && (
@@ -58,15 +61,17 @@ export function PortraitPreviewCard({
             height={variant.height}
             unoptimized
             className={cn(
-              "relative z-10 shadow-2xl ring-1 ring-white/10 transition-transform duration-300 group-hover:scale-(--hover-scale)",
-              isUniformMode && "h-full w-full object-contain",
+              "relative z-10 shadow-2xl transition-transform duration-300 group-hover:scale-(--hover-scale)",
+              isUniformMode && "max-h-full max-w-full object-contain",
             )}
             style={
-              {
-                width: `${variant.width}px`,
-                height: `${variant.height}px`,
-                "--hover-scale": 1 + 15 / variant.width,
-              } as React.CSSProperties
+              isUniformMode
+                ? { "--hover-scale": 1.05 }
+                : {
+                    width: `${variant.width}px`,
+                    height: `${variant.height}px`,
+                    "--hover-scale": 1 + 15 / variant.width,
+                  }
             }
           />
         ) : (
@@ -91,23 +96,15 @@ export function PortraitPreviewCard({
         </div>
 
         {hasCrop && (
-          <div className="mt-1 flex gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" size="icon-lg" asChild>
-                  <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
-                    <Edit2 className="size-5" />
-                    <span className="sr-only">Edit variant</span>
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit variant</p>
-              </TooltipContent>
-            </Tooltip>
+          <div className="mt-1 flex gap-3">
+            <Button variant="outline" asChild>
+              <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
+                <Edit2 className="mr-1 size-5 shrink-0" />
+                <span className="truncate">Edit</span>
+              </Link>
+            </Button>
             <Button
               variant="outline"
-              size="lg"
               className="flex-1"
               onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
             >
