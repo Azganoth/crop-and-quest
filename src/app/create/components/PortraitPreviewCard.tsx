@@ -7,17 +7,21 @@ import type { CropState } from "@/store/usePortraitStore";
 import { Download, Edit2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
 interface PortraitPreviewCardProps {
+  presetId: string;
   variant: PortraitVariant;
   crop?: CropState;
   isUniformMode?: boolean;
 }
 
-export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPreviewCardProps) {
+export function PortraitPreviewCard({
+  presetId,
+  variant,
+  crop,
+  isUniformMode,
+}: PortraitPreviewCardProps) {
   const hasCrop = !!crop?.croppedBlobUrl;
-  const params = useParams<{ presetId: string }>();
 
   return (
     <article
@@ -69,7 +73,7 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
           <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
             <span className="font-semibold">Skipped</span>
             <Button variant="secondary" className="mt-6" asChild>
-              <Link href={`/create/${params?.presetId}/${variant.key}?singleEdit=true`}>
+              <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
                 <Edit2 className="mr-2 size-4" />
                 Crop Variant
               </Link>
@@ -91,7 +95,7 @@ export function PortraitPreviewCard({ variant, crop, isUniformMode }: PortraitPr
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" size="icon-lg" asChild>
-                  <Link href={`/create/${params?.presetId}/${variant.key}?singleEdit=true`}>
+                  <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
                     <Edit2 className="size-5" />
                     <span className="sr-only">Edit variant</span>
                   </Link>

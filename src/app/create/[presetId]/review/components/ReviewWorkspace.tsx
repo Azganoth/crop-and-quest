@@ -24,7 +24,6 @@ import { generatePresetZip } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState, useTransition } from "react";
 import * as v from "valibot";
@@ -157,18 +156,13 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
         {preset.variants
           .toSorted((a, b) => a.height - b.height)
           .map((variant) => (
-            <Link
+            <PortraitPreviewCard
               key={variant.key}
-              href={`/create/${preset.id}/${variant.key}?singleEdit=true`}
-              passHref
-              legacyBehavior
-            >
-              <PortraitPreviewCard
-                variant={variant}
-                crop={crops[variant.key]}
-                isUniformMode={isUniformMode}
-              />
-            </Link>
+              presetId={preset.id}
+              variant={variant}
+              crop={crops[variant.key]}
+              isUniformMode={isUniformMode}
+            />
           ))}
       </div>
 
