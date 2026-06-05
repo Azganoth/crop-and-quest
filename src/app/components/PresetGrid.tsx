@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip
 import { Preset, PRESETS } from "@/data/presets";
 import { useMounted } from "@/hooks/useMounted";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -29,20 +29,33 @@ function PresetCard({
   return (
     <article className="group relative aspect-video w-full">
       {isCustom && (
-        <ConfirmationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <ConfirmationDialogTrigger asChild>
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2 z-30 h-8 w-8 opacity-0 shadow-md transition-opacity duration-300 group-hover:opacity-100 hover:bg-destructive focus:opacity-100"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              aria-label={`Delete ${preset.name}`}
-            >
-              <Trash2 className="size-4" />
-            </Button>
-          </ConfirmationDialogTrigger>
+        <div className="absolute top-2 right-2 z-30 flex gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus-within:opacity-100">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="h-8 w-8 shadow-md hover:bg-secondary/80"
+            asChild
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Edit ${preset.name}`}
+          >
+            <Link href={`/custom/${preset.id}/edit`}>
+              <Pencil className="size-4" />
+            </Link>
+          </Button>
+          <ConfirmationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <ConfirmationDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="icon"
+                className="h-8 w-8 shadow-md hover:bg-destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+                aria-label={`Delete ${preset.name}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </ConfirmationDialogTrigger>
           <ConfirmationDialogContent
             title="Delete Custom Preset"
             onConfirm={() => {
@@ -56,6 +69,7 @@ function PresetCard({
             undone.
           </ConfirmationDialogContent>
         </ConfirmationDialog>
+        </div>
       )}
       <Link
         href={`/create/${preset.id}/select`}
