@@ -25,7 +25,7 @@ export function PortraitPreviewCard({
   return (
     <article
       className={cn(
-        "flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all",
+        "flex flex-col overflow-hidden rounded-b-xl border border-border/50 bg-card shadow-sm transition-all",
         isUniformMode ? "w-85" : "w-fit max-w-full min-w-70",
       )}
     >
@@ -90,8 +90,8 @@ export function PortraitPreviewCard({
       <div className="flex flex-col gap-3 border-t border-border/50 p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-display text-lg font-semibold text-primary">{variant.label}</h3>
-          <span className="shrink-0 rounded bg-secondary px-1.5 py-1 font-mono text-sm font-medium text-secondary-foreground">
-            {variant.width}×{variant.height}px
+          <span className="shrink-0 rounded-lg bg-secondary px-2 py-1 font-mono text-sm font-medium text-secondary-foreground">
+            {variant.width}×{variant.height}
           </span>
         </div>
 

@@ -121,33 +121,22 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
   return (
     <section
       aria-label="Review and Export"
-      className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 pt-8 pb-20"
+      className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 pt-8 pb-28"
     >
       <header className="flex flex-col items-center gap-4 md:flex-row md:justify-between">
         <div className="text-center md:text-left">
           <h1 className="font-display text-2xl font-bold text-primary">
-            Review {preset.name} Portraits
+            Review <span className="underline underline-offset-4">{preset.name}</span> Portraits
           </h1>
-          <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          <p className="mt-1 text-sm font-medium tracking-wide text-muted-foreground uppercase">
             {Object.keys(crops).length} of {preset.variants.length} completed
           </p>
         </div>
 
-        <div className="flex flex-col items-center gap-6 md:flex-row">
-          <div className="flex items-center gap-3">
-            <Label htmlFor="view-mode" className="cursor-pointer font-medium text-muted-foreground">
-              Uniform Cards
-            </Label>
-            {isMounted && (
-              <Switch id="view-mode" checked={isUniformMode} onCheckedChange={setUniformMode} />
-            )}
-          </div>
-          <Separator orientation="vertical" className="hidden h-8 md:block" />
-          <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
-            <RefreshCw className="mr-2 size-4" />
-            {isPending ? "Starting Over..." : "Start Over"}
-          </Button>
-        </div>
+        <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
+          <RefreshCw className="mr-1 size-5" />
+          {isPending ? "Starting Over..." : "Start Over"}
+        </Button>
       </header>
 
       <Separator className="my-3" />
@@ -166,15 +155,19 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           ))}
       </div>
 
+      <div className="mx-auto flex items-center gap-3 rounded-lg border border-border/50 bg-secondary/30 px-4 py-3">
+        <Label htmlFor="view-mode" className="cursor-pointer">
+          Uniform Cards
+        </Label>
+        {isMounted && (
+          <Switch id="view-mode" checked={isUniformMode} onCheckedChange={setUniformMode} />
+        )}
+      </div>
+
       <form className="sticky bottom-4 z-50 mx-auto w-full max-w-4xl pt-6 pb-2" action={formAction}>
         <Panel className="flex flex-col items-center justify-between gap-4 bg-background/95 px-6 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] backdrop-blur supports-backdrop-filter:bg-background/80 md:flex-row dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
-          <Field orientation="horizontal" className="w-auto items-center gap-4">
-            <FieldLabel
-              htmlFor="portrait-name"
-              className="font-medium whitespace-nowrap text-foreground"
-            >
-              Portrait Name
-            </FieldLabel>
+          <Field orientation="horizontal" className="w-auto">
+            <FieldLabel htmlFor="portrait-name">Portrait Name</FieldLabel>
             <div className="relative flex flex-col">
               <Input
                 id="portrait-name"
@@ -187,10 +180,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
                 aria-invalid={!!errors["portraitName"]}
                 placeholder={preset.exportConfig.defaultName}
               />
-              <FieldError
-                className="absolute top-full mt-1 hidden text-[11px] whitespace-nowrap peer-aria-invalid:block"
-                errors={errors["portraitName"]}
-              />
+              <FieldError className="absolute top-full mt-1" errors={errors["portraitName"]} />
             </div>
           </Field>
           <Button
@@ -203,7 +193,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
               "Packaging..."
             ) : (
               <>
-                <FileArchive className="mr-2 size-5" />
+                <FileArchive className="mr-1 size-5" />
                 Download All
               </>
             )}

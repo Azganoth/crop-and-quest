@@ -61,7 +61,7 @@ function PresetCard({
         href={`/create/${preset.id}/select`}
         className="absolute top-0 left-0 z-10 flex w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-500 hover:z-20 hover:border-primary/50 hover:shadow-xl"
       >
-        <div className="relative aspect-video w-full bg-muted">
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
           {preset.cover ? (
             <Image
               src={preset.cover}
@@ -69,10 +69,10 @@ function PresetCard({
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               placeholder={typeof preset.cover === "string" ? "empty" : "blur"}
-              className="object-cover brightness-40 transition-all duration-700 group-hover:scale-110 group-hover:brightness-[0.20]"
+              className="object-cover brightness-40 transition-all duration-700 group-hover:scale-110 group-hover:brightness-20"
             />
           ) : (
-            <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-card transition-all duration-700 group-hover:brightness-[0.50]" />
+            <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-card transition-all duration-700 group-hover:brightness-50" />
           )}
           <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
             <h3 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
@@ -83,7 +83,7 @@ function PresetCard({
 
         <div className="grid grid-rows-[0fr] bg-card transition-all duration-500 group-hover:grid-rows-[1fr]">
           <div className="overflow-hidden">
-            <div className="flex flex-col px-4 pb-4">
+            <div className="flex flex-col px-4 pb-8">
               <p className="mt-4 mb-3 text-center text-xs font-medium tracking-wider text-muted-foreground uppercase">
                 Variants
               </p>
@@ -92,7 +92,7 @@ function PresetCard({
                   <Tooltip key={v.key}>
                     <TooltipTrigger asChild>
                       <div
-                        className="rounded-sm border border-border bg-secondary shadow-md"
+                        className="border border-border bg-secondary shadow-md"
                         style={{
                           aspectRatio: `${v.width} / ${v.height}`,
                           height: "48px",
@@ -131,19 +131,18 @@ export function PresetGrid() {
       <section>
         <h2 className="mb-6 font-display text-2xl font-bold">Custom Presets</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Create Custom Preset Card */}
           <article className="relative aspect-video w-full">
             <Link
               href="/custom/new"
               className="group absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-primary/40 bg-card/50 shadow-sm transition-all duration-500 hover:z-20 hover:border-primary hover:bg-card hover:shadow-xl"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
-                <Plus className="h-6 w-6" />
+              <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
+                <Plus className="size-6" />
               </div>
-              <h3 className="mt-4 font-display text-xl font-bold tracking-wide text-primary">
+              <h3 className="mt-2 font-display text-xl font-bold tracking-wide text-primary">
                 Custom Preset
               </h3>
-              <p className="mt-2 px-4 text-center text-sm text-muted-foreground">
+              <p className="mt-1 px-4 text-center text-sm text-muted-foreground">
                 Define dimensions for any game or mod.
               </p>
             </Link>

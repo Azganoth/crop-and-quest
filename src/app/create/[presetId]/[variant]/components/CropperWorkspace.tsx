@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/Button";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
-import type { Preset, PortraitVariant } from "@/data/presets";
-import { usePortraitStore } from "@/store/usePortraitStore";
+import type { PortraitVariant, Preset } from "@/data/presets";
 import { exportCroppedImage } from "@/lib/canvas";
+import { usePortraitStore } from "@/store/usePortraitStore";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -168,9 +168,6 @@ export function CropperWorkspace({
       <Panel asChild className="z-20 w-full md:m-6 md:w-80 md:shrink-0 lg:w-96">
         <aside>
           <header className="flex flex-col gap-6">
-            <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
-              {preset.name}
-            </span>
             <div className="flex items-center gap-4">
               <Button variant="outline" size="icon" className="shrink-0" asChild>
                 <Link href={backHref} aria-label="Go back">
@@ -202,6 +199,9 @@ export function CropperWorkspace({
                 </div>
               </div>
             )}
+            <span className="text-center text-sm font-bold tracking-widest text-muted-foreground uppercase">
+              {preset.name}
+            </span>
           </header>
 
           <Separator />
@@ -211,13 +211,21 @@ export function CropperWorkspace({
             <RotationControl rotation={rotation} onRotationChange={setRotation} />
             <p className="mt-auto space-x-2 text-center text-sm text-muted-foreground">
               <span>
-                Target: {variant.width}x{variant.height} px
+                Target:{" "}
+                <span className="font-medium text-foreground">
+                  {variant.width}x{variant.height}
+                </span>{" "}
+                px
               </span>
               {imageResolution && (
                 <>
                   <span>•</span>
                   <span>
-                    Source: {imageResolution.width}x{imageResolution.height} px
+                    Source:{" "}
+                    <span className="font-medium text-foreground">
+                      {imageResolution.width}x{imageResolution.height}
+                    </span>{" "}
+                    px
                   </span>
                 </>
               )}
@@ -243,7 +251,7 @@ export function CropperWorkspace({
                 disabled={isProcessing || isPending}
                 className="w-full text-base"
               >
-                Cancel Edit
+                Cancel
               </Button>
             ) : (
               variant.optional && (

@@ -1,4 +1,14 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+
 export function SiteFooter() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/create") || pathname.startsWith("/custom")) {
+    return null;
+  }
+
   return (
     <footer className="border-t py-6 md:py-0">
       <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 md:h-16 md:flex-row">

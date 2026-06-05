@@ -12,7 +12,7 @@ export function Panel({ className, asChild = false, ...props }: PanelProps) {
   return (
     <Comp
       className={cn(
-        "flex flex-col gap-6 overflow-hidden border border-border/50 bg-card p-6 shadow-xl",
+        "flex flex-col gap-6 overflow-hidden rounded-3xl border border-border/50 bg-card p-6 shadow-xl",
         className,
       )}
       {...props}

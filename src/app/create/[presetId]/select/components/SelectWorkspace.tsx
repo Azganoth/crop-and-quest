@@ -102,7 +102,7 @@ export function SelectWorkspace({ preset }: SelectWorkspaceProps) {
         </header>
         <label
           htmlFor="file-upload"
-          className="group relative flex w-full cursor-pointer flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 bg-muted/20 py-16 transition-all hover:border-primary/50 hover:bg-muted/40"
+          className="group relative flex w-full cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-muted-foreground/25 bg-muted/20 py-16 transition-all hover:border-primary/50 hover:bg-muted/40"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >

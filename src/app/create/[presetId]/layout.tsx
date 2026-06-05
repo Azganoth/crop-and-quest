@@ -16,8 +16,8 @@ export default async function EditorLayout({
   return (
     <div className="relative flex flex-1 flex-col">
       <SessionProtector />
-      {preset?.cover && (
-        <div className="pointer-events-none fixed inset-0 z-[-1] overflow-hidden">
+      <div className="pointer-events-none fixed inset-0 -z-1 overflow-hidden">
+        {preset?.cover ? (
           <Image
             src={preset.cover}
             alt="Background cover"
@@ -26,10 +26,15 @@ export default async function EditorLayout({
             className="object-cover opacity-20 mix-blend-overlay blur-sm"
             placeholder="blur"
           />
-          {/* Vignette/gradient overlay to ensure text legibility */}
-          <div className="absolute inset-0 bg-linear-to-b from-background/60 via-background/80 to-background" />
-        </div>
-      )}
+        ) : (
+          <div className="absolute inset-0 opacity-30 mix-blend-overlay">
+            <div className="absolute -top-1/5 -left-1/10 h-[50vh] w-[50vw] rounded-full bg-primary/40 blur-[100px]" />
+            <div className="absolute top-1/5 -right-1/10 h-[60vh] w-[40vw] rounded-full bg-secondary/40 blur-[120px]" />
+            <div className="absolute -bottom-1/5 left-1/5 h-[50vh] w-[60vw] rounded-full bg-primary/20 blur-[100px]" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-linear-to-b from-background/60 via-background/80 to-background" />
+      </div>
       <div className="relative z-0 flex w-full flex-1 flex-col">{children}</div>
     </div>
   );

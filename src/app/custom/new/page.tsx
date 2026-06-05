@@ -164,7 +164,7 @@ export default function CreateCustomPresetPage() {
       </header>
 
       <form onSubmit={handleSave} className="flex flex-col gap-8" noValidate>
-        <Panel asChild className="flex flex-col gap-6">
+        <Panel asChild>
           <section>
             <h2 className="font-display text-xl font-bold">General Settings</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -207,7 +207,7 @@ export default function CreateCustomPresetPage() {
                 />
               </Field>
 
-              <Field className="flex flex-row items-center justify-between rounded-lg">
+              <Field className="flex-row items-center justify-between rounded-lg">
                 <div className="space-y-0.5">
                   <FieldLabel className="text-base" htmlFor="wrap-folder">
                     Wrap in Folder
@@ -222,7 +222,7 @@ export default function CreateCustomPresetPage() {
           </section>
         </Panel>
 
-        <Panel asChild className="flex flex-col gap-6">
+        <Panel asChild>
           <section>
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-1">
@@ -252,7 +252,7 @@ export default function CreateCustomPresetPage() {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div
-                              className="rounded-sm border border-border bg-secondary shadow-sm"
+                              className="border border-border bg-secondary shadow-sm"
                               style={{
                                 aspectRatio: `${variant.width} / ${variant.height}`,
                                 height: "32px",
