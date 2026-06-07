@@ -11,22 +11,34 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/Field";
+import { Field, FieldError, FieldLabel, FieldTitle } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
 import { Switch } from "@/components/ui/Switch";
 import { Preset } from "@/data/presets";
 import { useMounted } from "@/hooks/useMounted";
-import { useValidation } from "@/hooks/useValidation";
 import { generatePresetZip } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useForm } from "@tanstack/react-form";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import * as v from "valibot";
+
+const buildPortraitNameSchema = (maxLength: number) =>
+  v.object({
+    portraitName: v.pipe(
+      v.string(),
+      v.trim(),
+      v.regex(
+        /^[a-zA-Z0-9.\-_ ]*$/,
+        "Invalid characters (only letters, numbers, spaces, dots, dashes, and underscores)",
+      ),
+      v.maxLength(maxLength, `Max length is ${maxLength} characters`),
+    ),
+  });
 
 export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const router = useRouter();
@@ -34,7 +46,6 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const { crops, clearSession } = usePortraitStore();
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [portraitName, setPortraitName] = useState(preset.exportConfig.defaultName);
   const [isPending, startTransition] = useTransition();
   const { isUniformMode, setUniformMode } = useSettingsStore();
   const isMounted = useMounted();
@@ -47,69 +58,57 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
   }, [crops, zipBlobUrl]);
 
   // Revoking the object URL on unmount prevents memory leaks from untracked blob references.
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (zipBlobUrl) URL.revokeObjectURL(zipBlobUrl);
-    };
-  }, [zipBlobUrl]);
+    },
+    [zipBlobUrl],
+  );
 
-  const schema = useMemo(() => {
-    return v.object({
-      portraitName: v.pipe(
-        v.string(),
-        v.regex(
-          /^[a-zA-Z0-9.\-_ ]*$/,
-          "Invalid characters (only letters, numbers, spaces, dots, dashes, and underscores)",
-        ),
-        v.maxLength(
-          preset.exportConfig.maxLength || 50,
-          `Max length is ${preset.exportConfig.maxLength || 50} characters`,
-        ),
-      ),
-    });
-  }, [preset.exportConfig.maxLength]);
+  const portraitNameSchema = useMemo(
+    () => buildPortraitNameSchema(preset.exportConfig.maxLength || 50),
+    [preset.exportConfig.maxLength],
+  );
 
-  const { errors, validate, clearError } = useValidation(schema);
+  const form = useForm({
+    defaultValues: { portraitName: preset.exportConfig.defaultName },
+    validators: {
+      onChange: portraitNameSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (zipBlobUrl) {
+        const a = document.createElement("a");
+        a.href = zipBlobUrl;
+        a.download = downloadName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return;
+      }
 
-  const safePortraitName = portraitName.trim() || preset.exportConfig.defaultName;
+      try {
+        const zipBlob = await generatePresetZip(preset, crops, value.portraitName);
+        const url = URL.createObjectURL(zipBlob);
+        setZipBlobUrl(url);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = downloadName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error(error);
+        const msg =
+          error instanceof Error
+            ? error.message
+            : "Failed to generate ZIP file. Please download individual files instead.";
+        setErrorMsg(msg);
+      }
+    },
+  });
+
   const downloadName = `${preset.id}-portraits.zip`;
-
-  const [, formAction, isExporting] = useActionState(async () => {
-    if (zipBlobUrl) {
-      const a = document.createElement("a");
-      a.href = zipBlobUrl;
-      a.download = downloadName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      return;
-    }
-
-    const isValid = validate({ portraitName });
-    if (!isValid) {
-      return;
-    }
-
-    try {
-      const zipBlob = await generatePresetZip(preset, crops, safePortraitName);
-      const url = URL.createObjectURL(zipBlob);
-      setZipBlobUrl(url);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = downloadName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error(error);
-      const msg =
-        error instanceof Error
-          ? error.message
-          : "Failed to generate ZIP file. Please download individual files instead.";
-      setErrorMsg(msg);
-    }
-  }, null);
 
   const handleStartOver = () => {
     startTransition(() => {
@@ -132,15 +131,12 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
             {Object.keys(crops).length} of {preset.variants.length} completed
           </p>
         </div>
-
         <Button variant="outline" onClick={handleStartOver} disabled={isPending}>
           <RefreshCw className="mr-1 size-5" />
           {isPending ? "Starting Over..." : "Start Over"}
         </Button>
       </header>
-
       <Separator className="my-3" />
-
       <div className="flex flex-wrap items-start justify-center gap-8">
         {preset.variants
           .toSorted((a, b) => a.height - b.height)
@@ -154,50 +150,74 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
             />
           ))}
       </div>
-
-      <div className="mx-auto flex items-center gap-3 rounded-lg border border-border/50 bg-secondary/30 px-4 py-3">
-        <Label htmlFor="view-mode" className="cursor-pointer">
-          Uniform Cards
-        </Label>
+      <Field
+        orientation="horizontal"
+        className="mx-auto w-fit rounded-lg border border-border/50 bg-secondary/30 px-4 py-3"
+      >
+        <FieldTitle>Uniform Cards</FieldTitle>
         {isMounted && (
-          <Switch id="view-mode" checked={isUniformMode} onCheckedChange={setUniformMode} />
+          <Switch
+            aria-label="Uniform Cards"
+            checked={isUniformMode}
+            onCheckedChange={setUniformMode}
+          />
         )}
-      </div>
-
-      <form className="sticky bottom-4 z-50 mx-auto w-full max-w-4xl pt-6 pb-2" action={formAction}>
+      </Field>
+      <form
+        className="sticky bottom-4 z-50 mx-auto w-full max-w-4xl pt-6 pb-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
         <Panel className="flex flex-col items-center justify-between gap-4 bg-background/95 px-6 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] backdrop-blur supports-backdrop-filter:bg-background/80 md:flex-row dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
-          <Field orientation="horizontal" className="w-auto">
-            <FieldLabel htmlFor="portrait-name">Portrait Name</FieldLabel>
-            <div className="relative flex flex-col">
-              <Input
-                id="portrait-name"
-                value={portraitName}
-                onChange={(e) => {
-                  setPortraitName(e.target.value);
-                  clearError("portraitName");
-                }}
-                className="w-48 bg-background font-mono"
-                aria-invalid={!!errors["portraitName"]}
-                placeholder={preset.exportConfig.defaultName}
-              />
-              <FieldError className="absolute top-full mt-1" errors={errors["portraitName"]} />
-            </div>
-          </Field>
-          <Button
-            type="submit"
-            disabled={isExporting || Object.keys(crops).length !== preset.variants.length}
-            size="lg"
-            className="w-full shadow-lg md:w-auto"
-          >
-            {isExporting ? (
-              "Packaging..."
-            ) : (
-              <>
-                <FileArchive className="mr-1 size-5" />
-                Download All
-              </>
+          <form.Field name="portraitName">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+              return (
+                <Field orientation="horizontal" className="w-auto" data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>Portrait Name</FieldLabel>
+                  <div className="relative flex flex-col">
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      className="w-48 bg-background font-mono"
+                      placeholder={preset.exportConfig.defaultName}
+                      autoComplete="off"
+                    />
+                    <FieldError
+                      className="absolute top-full mt-1"
+                      errors={field.state.meta.errors}
+                    />
+                  </div>
+                </Field>
+              );
+            }}
+          </form.Field>
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                type="submit"
+                disabled={!canSubmit || Object.keys(crops).length !== preset.variants.length}
+                size="lg"
+                className="w-full shadow-lg md:w-auto"
+              >
+                {isSubmitting ? (
+                  "Packaging..."
+                ) : (
+                  <>
+                    <FileArchive className="mr-1 size-5" />
+                    Download All
+                  </>
+                )}
+              </Button>
             )}
-          </Button>
+          </form.Subscribe>
         </Panel>
       </form>
 

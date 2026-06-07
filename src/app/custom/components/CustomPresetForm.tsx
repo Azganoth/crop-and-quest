@@ -1,48 +1,70 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Field, FieldError, FieldLabel } from "@/components/ui/Field";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Panel } from "@/components/ui/Panel";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/Select";
 import { Switch } from "@/components/ui/Switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
-import { PortraitVariant, Preset } from "@/data/presets";
-import { useValidation } from "@/hooks/useValidation";
+import { Preset, type PortraitExportFormat } from "@/data/presets";
 import { getAspectRatioString } from "@/lib/math";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
+import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo } from "react";
 import * as v from "valibot";
 
-const presetSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, "Preset name is required")),
+const presetVariantInputSchema = v.object({
+  label: v.pipe(v.string(), v.trim(), v.minLength(1, "Label is required")),
+  width: v.pipe(v.string(), v.transform(Number), v.minValue(1, "Must be > 0")),
+  height: v.pipe(v.string(), v.transform(Number), v.minValue(1, "Must be > 0")),
+  format: v.picklist(["png", "jpeg", "webp", "bmp", "tga"], "Invalid format"),
+  filename: v.pipe(v.string(), v.trim()),
+  optional: v.boolean(),
+});
+
+const presetInputSchema = v.object({
+  name: v.pipe(v.string(), v.trim(), v.minLength(1, "Preset name is required")),
   variants: v.pipe(
-    v.array(
-      v.object({
-        label: v.pipe(v.string(), v.minLength(1, "Label is required")),
-        width: v.pipe(
-          v.union([v.number(), v.string()]),
-          v.transform(Number),
-          v.minValue(1, "Must be > 0"),
-        ),
-        height: v.pipe(
-          v.union([v.number(), v.string()]),
-          v.transform(Number),
-          v.minValue(1, "Must be > 0"),
-        ),
-      }),
-    ),
+    v.array(presetVariantInputSchema),
     v.minLength(1, "At least one variant is required"),
   ),
+  defaultName: v.pipe(v.string(), v.trim()),
+  maxLength: v.pipe(v.string(), v.transform(Number), v.minValue(1, "Must be > 0")),
+  wrapInFolder: v.boolean(),
+});
+
+type PresetVariantInput = v.InferInput<typeof presetVariantInputSchema>;
+type PresetInput = Omit<v.InferInput<typeof presetInputSchema>, "variants"> & {
+  variants: PresetVariantInput[];
+};
+
+const getDefaultVariant = (): PresetVariantInput => ({
+  label: "Portrait",
+  width: "256",
+  height: "256",
+  format: "png",
+  filename: "{name}.png",
+  optional: false,
 });
 
 export function CustomPresetForm({
@@ -54,147 +76,76 @@ export function CustomPresetForm({
 }) {
   const router = useRouter();
   const { addCustomPreset, updateCustomPreset } = useCustomPresetsStore();
-  const { errors, validate, clearError } = useValidation(presetSchema);
 
   const isEditMode = mode === "edit";
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [defaultName, setDefaultName] = useState(
-    initialData?.exportConfig?.defaultName ?? "custom_portrait",
-  );
-  const [wrapInFolder, setWrapInFolder] = useState(
-    initialData?.exportConfig?.wrapInFolder ?? false,
-  );
-  const [maxLength, setMaxLength] = useState<number | "">(
-    initialData?.exportConfig?.maxLength ?? "",
+
+  const defaultValues = useMemo<PresetInput>(
+    () => ({
+      name: initialData?.name ?? "",
+      defaultName: initialData?.exportConfig?.defaultName ?? "custom_portrait",
+      maxLength: initialData?.exportConfig?.maxLength?.toString() ?? "",
+      wrapInFolder: initialData?.exportConfig?.wrapInFolder ?? false,
+      variants: initialData
+        ? initialData.variants.map((v) => ({
+            label: v.label,
+            width: v.width.toString(),
+            height: v.height.toString(),
+            format: v.format,
+            filename: v.filename,
+            optional: false,
+          }))
+        : [getDefaultVariant()],
+    }),
+    [initialData],
   );
 
-  const [variants, setVariants] = useState<
-    Array<{
-      id: string;
-      label: string;
-      width: number | "";
-      height: number | "";
-      filename: string;
-      format: PortraitVariant["format"];
-    }>
-  >(
-    initialData
-      ? initialData.variants.map((v) => {
-          let displayFilename = v.filename;
-          if (displayFilename === `{name}.${v.format}`) {
-            displayFilename = ""; // It was empty originally
-          } else if (
-            displayFilename.startsWith("{name}") &&
-            displayFilename.endsWith(`.${v.format}`)
-          ) {
-            displayFilename = displayFilename.substring(
-              6,
-              displayFilename.length - v.format.length - 1,
-            );
+  const form = useForm({
+    defaultValues,
+    validators: {
+      onSubmit: presetInputSchema,
+    },
+    onSubmit: ({ value }) => {
+      const parsedValue = v.parse(presetInputSchema, value);
+      const presetId = isEditMode && initialData ? initialData.id : `custom-${crypto.randomUUID()}`;
+
+      const newPreset: Preset = {
+        id: presetId,
+        name: value.name,
+        exportConfig: {
+          wrapInFolder: parsedValue.wrapInFolder,
+          defaultName: parsedValue.defaultName || "custom_portrait",
+          maxLength: parsedValue.maxLength,
+        },
+        variants: parsedValue.variants.map((v, i) => {
+          let finalFilename = v.filename;
+          if (finalFilename) {
+            if (!finalFilename.includes("{name}")) {
+              finalFilename = `{name}${finalFilename}.${v.format}`;
+            }
+          } else {
+            finalFilename = `{name}.${v.format}`;
           }
 
           return {
-            id: v.key,
-            label: v.label || "",
+            key: `variant-${i}`,
+            label: v.label,
             width: v.width,
             height: v.height,
-            filename: displayFilename,
             format: v.format,
+            filename: finalFilename,
           };
-        })
-      : [
-          {
-            id: crypto.randomUUID(),
-            label: "Main Portrait",
-            width: 256,
-            height: 256,
-            filename: "",
-            format: "png",
-          },
-        ],
-  );
+        }),
+      };
 
-  const handleAddVariant = () => {
-    setVariants([
-      {
-        id: crypto.randomUUID(),
-        label: "",
-        width: "",
-        height: "",
-        filename: "",
-        format: "png",
-      },
-      ...variants,
-    ]);
-    clearError("variants");
-  };
-
-  const handleRemoveVariant = (index: number, id: string) => {
-    setVariants(variants.filter((v) => v.id !== id));
-    clearError(`variants.${index}.label`);
-    clearError(`variants.${index}.width`);
-    clearError(`variants.${index}.height`);
-  };
-
-  const updateVariant = (index: number, id: string, field: string, value: string | number) => {
-    setVariants(
-      variants.map((v) => {
-        if (v.id === id) {
-          return { ...v, [field]: value };
-        }
-        return v;
-      }),
-    );
-    clearError(`variants.${index}.${field}`);
-  };
-
-  const handleSave = (e: React.SubmitEvent) => {
-    e.preventDefault();
-
-    const isValid = validate({ name: name.trim(), variants });
-    if (!isValid) {
-      return;
-    }
-
-    const presetId = isEditMode && initialData ? initialData.id : `custom-${crypto.randomUUID()}`;
-
-    const newPreset: Preset = {
-      id: presetId,
-      name: name.trim(),
-      exportConfig: {
-        wrapInFolder,
-        defaultName: defaultName.trim(),
-        maxLength: maxLength === "" ? undefined : Number(maxLength),
-      },
-      variants: variants.map((v, i) => {
-        let finalFilename = v.filename.trim();
-        if (finalFilename) {
-          if (!finalFilename.includes("{name}")) {
-            finalFilename = `{name}${finalFilename}.${v.format}`;
-          }
-        } else {
-          finalFilename = `{name}.${v.format}`;
-        }
-
-        return {
-          key: `variant-${i}`,
-          label: v.label.trim(),
-          width: Number(v.width),
-          height: Number(v.height),
-          format: v.format,
-          filename: finalFilename,
-        };
-      }),
-    };
-
-    if (isEditMode && initialData) {
-      updateCustomPreset(presetId, newPreset);
-      router.push("/");
-    } else {
-      addCustomPreset(newPreset);
-      router.push(`/create/${presetId}/select`);
-    }
-  };
+      if (isEditMode && initialData) {
+        updateCustomPreset(presetId, newPreset);
+        router.push("/");
+      } else {
+        addCustomPreset(newPreset);
+        router.push(`/create/${presetId}/select`);
+      }
+    },
+  });
 
   return (
     <div className="container mx-auto flex max-w-4xl flex-col gap-8 px-4 py-12 md:py-24">
@@ -209,212 +160,324 @@ export function CustomPresetForm({
         </p>
       </header>
 
-      <form onSubmit={handleSave} className="flex flex-col gap-8" noValidate>
+      <form
+        className="flex flex-col gap-8"
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
         <Panel asChild>
           <section>
             <h2 className="font-display text-xl font-bold">General Settings</h2>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Field>
-                <FieldLabel htmlFor="preset-name">Preset Name</FieldLabel>
-                <Input
-                  id="preset-name"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    clearError("name");
-                  }}
-                  placeholder="e.g. Arcanum"
-                  aria-invalid={!!errors["name"]}
-                />
-                <FieldError errors={errors["name"]} />
-              </Field>
+            <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <form.Field name="name">
+                {(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
-              <Field>
-                <FieldLabel htmlFor="default-name">Default Portrait Name</FieldLabel>
-                <Input
-                  id="default-name"
-                  value={defaultName}
-                  onChange={(e) => setDefaultName(e.target.value)}
-                  placeholder="e.g. PORTRAIT"
-                />
-              </Field>
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Preset Name</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="e.g. Arcanum"
+                        autoComplete="off"
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="defaultName">
+                {(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
-              <Field>
-                <FieldLabel htmlFor="max-length">Max Filename Length (Optional)</FieldLabel>
-                <Input
-                  id="max-length"
-                  type="number"
-                  value={maxLength}
-                  onChange={(e) =>
-                    setMaxLength(e.target.value === "" ? "" : Number(e.target.value))
-                  }
-                  placeholder="e.g. 8"
-                  min={1}
-                />
-              </Field>
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Default Portrait Name</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="e.g. PORTRAIT"
+                        autoComplete="off"
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="maxLength">
+                {(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
-              <Field className="flex-row items-center justify-between rounded-lg">
-                <div className="space-y-0.5">
-                  <FieldLabel className="text-base" htmlFor="wrap-folder">
-                    Wrap in Folder
-                  </FieldLabel>
-                  <p className="text-sm text-muted-foreground">
-                    Places the images inside a folder in the ZIP.
-                  </p>
-                </div>
-                <Switch id="wrap-folder" checked={wrapInFolder} onCheckedChange={setWrapInFolder} />
-              </Field>
-            </div>
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Max Filename Length (Optional)</FieldLabel>
+                      <Input
+                        type="number"
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        autoComplete="off"
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </Field>
+                  );
+                }}
+              </form.Field>
+              <form.Field name="wrapInFolder">
+                {(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+                  return (
+                    <Field orientation="horizontal" data-invalid={isInvalid}>
+                      <FieldContent>
+                        <FieldLabel htmlFor={field.name}>Wrap in Folder</FieldLabel>
+                        <FieldDescription>
+                          Places the images inside a folder in the ZIP.
+                        </FieldDescription>
+                        <FieldError errors={field.state.meta.errors} />
+                      </FieldContent>
+                      <Switch
+                        id={field.name}
+                        name={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={field.handleChange}
+                        onBlur={field.handleBlur}
+                        aria-invalid={isInvalid}
+                      />
+                    </Field>
+                  );
+                }}
+              </form.Field>
+            </FieldGroup>
           </section>
         </Panel>
 
-        <Panel asChild>
-          <section>
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-1">
-                <h2 className="font-display text-xl font-bold">Portrait Variants</h2>
-                {errors["variants"] && (
-                  <span className="text-sm font-medium text-destructive">{errors["variants"]}</span>
-                )}
-              </div>
-              <Button type="button" variant="outline" size="sm" onClick={handleAddVariant}>
-                <Plus className="mr-1 size-5" />
-                Add Variant
+        <form.Field name="variants" mode="array">
+          {(field) => (
+            <Panel asChild>
+              <section>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-xl font-bold">Portrait Variants</h2>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => field.pushValue(getDefaultVariant())}
+                  >
+                    <Plus className="mr-1 size-5" />
+                    Add Variant
+                  </Button>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  {field.state.value.map((variant, i, arr) => (
+                    <FieldSet
+                      key={i}
+                      className="rounded-lg border border-border/50 bg-background/50 p-4"
+                    >
+                      <div className="flex min-h-10 items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <FieldLegend className="font-bold text-muted-foreground">
+                            Variant {arr.length - i}
+                          </FieldLegend>
+                          {variant.width && variant.height && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className="border border-border bg-secondary shadow-sm"
+                                  style={{
+                                    aspectRatio: `${variant.width} / ${variant.height}`,
+                                    height: "32px",
+                                  }}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent side="right">
+                                <span className="font-semibold capitalize">Aspect Ratio</span>
+                                <span className="ml-2 font-medium text-muted-foreground">
+                                  {getAspectRatioString(
+                                    Number(variant.width),
+                                    Number(variant.height),
+                                  )}
+                                </span>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                        {arr.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => field.removeValue(i)}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        )}
+                      </div>
+
+                      <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
+                        <form.Field name={`variants[${i}].label`}>
+                          {(subField) => {
+                            const isInvalid =
+                              subField.state.meta.isTouched && !subField.state.meta.isValid;
+
+                            return (
+                              <Field className="md:col-span-2" data-invalid={isInvalid}>
+                                <FieldLabel htmlFor={subField.name}>Label</FieldLabel>
+                                <Input
+                                  id={subField.name}
+                                  name={subField.name}
+                                  value={subField.state.value}
+                                  onBlur={subField.handleBlur}
+                                  onChange={(e) => subField.handleChange(e.target.value)}
+                                  aria-invalid={isInvalid}
+                                  placeholder="e.g. Large Portrait"
+                                  autoComplete="off"
+                                />
+                                <FieldError errors={subField.state.meta.errors} />
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                        <form.Field name={`variants[${i}].width`}>
+                          {(subField) => {
+                            const isInvalid =
+                              subField.state.meta.isTouched && !subField.state.meta.isValid;
+
+                            return (
+                              <Field data-invalid={isInvalid}>
+                                <FieldLabel htmlFor={subField.name}>Width (px)</FieldLabel>
+                                <Input
+                                  type="number"
+                                  id={subField.name}
+                                  name={subField.name}
+                                  value={subField.state.value}
+                                  onBlur={subField.handleBlur}
+                                  onChange={(e) => subField.handleChange(e.target.value)}
+                                  aria-invalid={isInvalid}
+                                />
+                                <FieldError errors={subField.state.meta.errors} />
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                        <form.Field name={`variants[${i}].height`}>
+                          {(subField) => {
+                            const isInvalid =
+                              subField.state.meta.isTouched && !subField.state.meta.isValid;
+
+                            return (
+                              <Field data-invalid={isInvalid}>
+                                <FieldLabel htmlFor={subField.name}>Height (px)</FieldLabel>
+                                <Input
+                                  type="number"
+                                  id={subField.name}
+                                  name={subField.name}
+                                  value={subField.state.value}
+                                  onBlur={subField.handleBlur}
+                                  onChange={(e) => subField.handleChange(e.target.value)}
+                                  aria-invalid={isInvalid}
+                                />
+                                <FieldError errors={subField.state.meta.errors} />
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                        <form.Field name={`variants[${i}].format`}>
+                          {(subField) => {
+                            const isInvalid =
+                              subField.state.meta.isTouched && !subField.state.meta.isValid;
+
+                            return (
+                              <Field data-invalid={isInvalid}>
+                                <FieldContent>
+                                  <FieldLabel htmlFor={subField.name}>Format</FieldLabel>
+                                  <FieldError errors={subField.state.meta.errors} />
+                                </FieldContent>
+                                <Select
+                                  value={subField.state.value}
+                                  onValueChange={(val) => {
+                                    subField.handleChange(val as PortraitExportFormat);
+                                  }}
+                                >
+                                  <SelectTrigger id={subField.name} aria-invalid={isInvalid}>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectItem value="png">PNG</SelectItem>
+                                      <SelectItem value="jpeg">JPEG</SelectItem>
+                                      <SelectItem value="webp">WEBP</SelectItem>
+                                      <SelectItem value="bmp">BMP</SelectItem>
+                                      <SelectItem value="tga">TGA</SelectItem>
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                        <form.Field name={`variants[${i}].filename`}>
+                          {(subField) => {
+                            const isInvalid =
+                              subField.state.meta.isTouched && !subField.state.meta.isValid;
+
+                            return (
+                              <Field className="md:col-span-2" data-invalid={isInvalid}>
+                                <FieldLabel htmlFor={subField.name}>
+                                  Filename Suffix / Override
+                                </FieldLabel>
+                                <Input
+                                  id={subField.name}
+                                  name={subField.name}
+                                  value={subField.state.value}
+                                  onBlur={subField.handleBlur}
+                                  onChange={(e) => subField.handleChange(e.target.value)}
+                                  aria-invalid={isInvalid}
+                                  placeholder="e.g. _L (appends to portrait name)"
+                                  autoComplete="off"
+                                />
+                                <FieldError errors={subField.state.meta.errors} />
+                              </Field>
+                            );
+                          }}
+                        </form.Field>
+                      </FieldGroup>
+                    </FieldSet>
+                  ))}
+                </div>
+              </section>
+            </Panel>
+          )}
+        </form.Field>
+
+        <form.Subscribe selector={(state) => [state.canSubmit]}>
+          {([canSubmit]) => (
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="ghost" size="lg" asChild>
+                <Link href="/">Cancel</Link>
+              </Button>
+              <Button type="submit" size="lg" disabled={!canSubmit}>
+                {mode === "create" ? "Save and Continue" : "Save Changes"}
               </Button>
             </div>
-
-            <div className="flex flex-col gap-6">
-              {variants.map((variant, index) => (
-                <fieldset
-                  key={variant.id}
-                  className="flex flex-col gap-4 rounded-lg border border-border/50 bg-background/50 p-4"
-                >
-                  <div className="flex min-h-10 items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <legend className="font-bold text-muted-foreground">
-                        Variant {variants.length - index}
-                      </legend>
-                      {variant.width && variant.height && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div
-                              className="border border-border bg-secondary shadow-sm"
-                              style={{
-                                aspectRatio: `${variant.width} / ${variant.height}`,
-                                height: "32px",
-                              }}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent side="right">
-                            <span className="font-semibold capitalize">Aspect Ratio</span>
-                            <span className="ml-2 font-medium text-muted-foreground">
-                              {getAspectRatioString(variant.width, variant.height)}
-                            </span>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                    </div>
-                    {variants.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => handleRemoveVariant(index, variant.id)}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
-                    <Field className="md:col-span-2">
-                      <FieldLabel htmlFor={`label-${variant.id}`}>Label</FieldLabel>
-                      <Input
-                        id={`label-${variant.id}`}
-                        value={variant.label}
-                        onChange={(e) => updateVariant(index, variant.id, "label", e.target.value)}
-                        placeholder="e.g. Large Portrait"
-                        aria-invalid={!!errors[`variants.${index}.label`]}
-                      />
-                      <FieldError errors={errors[`variants.${index}.label`]} />
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor={`width-${variant.id}`}>Width (px)</FieldLabel>
-                      <Input
-                        id={`width-${variant.id}`}
-                        type="number"
-                        value={variant.width}
-                        onChange={(e) => updateVariant(index, variant.id, "width", e.target.value)}
-                        placeholder="256"
-                        min={1}
-                        aria-invalid={!!errors[`variants.${index}.width`]}
-                      />
-                      <FieldError errors={errors[`variants.${index}.width`]} />
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor={`height-${variant.id}`}>Height (px)</FieldLabel>
-                      <Input
-                        id={`height-${variant.id}`}
-                        type="number"
-                        value={variant.height}
-                        onChange={(e) => updateVariant(index, variant.id, "height", e.target.value)}
-                        placeholder="256"
-                        min={1}
-                        aria-invalid={!!errors[`variants.${index}.height`]}
-                      />
-                      <FieldError errors={errors[`variants.${index}.height`]} />
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor={`format-${variant.id}`}>Format</FieldLabel>
-                      <Select
-                        value={variant.format}
-                        onValueChange={(val) => updateVariant(index, variant.id, "format", val)}
-                      >
-                        <SelectTrigger id={`format-${variant.id}`}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="png">PNG</SelectItem>
-                          <SelectItem value="jpeg">JPEG</SelectItem>
-                          <SelectItem value="webp">WEBP</SelectItem>
-                          <SelectItem value="bmp">BMP</SelectItem>
-                          <SelectItem value="tga">TGA</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </Field>
-
-                    <Field className="md:col-span-2">
-                      <FieldLabel htmlFor={`suffix-${variant.id}`}>
-                        Filename Suffix / Override
-                      </FieldLabel>
-                      <Input
-                        id={`suffix-${variant.id}`}
-                        value={variant.filename}
-                        onChange={(e) =>
-                          updateVariant(index, variant.id, "filename", e.target.value)
-                        }
-                        placeholder="e.g. _L (appends to portrait name)"
-                      />
-                    </Field>
-                  </div>
-                </fieldset>
-              ))}
-            </div>
-          </section>
-        </Panel>
-
-        <div className="flex justify-end gap-4">
-          <Button type="button" variant="ghost" size="lg" asChild>
-            <Link href="/">Cancel</Link>
-          </Button>
-          <Button type="submit" size="lg">
-            {mode === "create" ? "Save and Continue" : "Save Changes"}
-          </Button>
-        </div>
+          )}
+        </form.Subscribe>
       </form>
     </div>
   );

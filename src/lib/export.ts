@@ -37,14 +37,8 @@ export async function generatePresetZip(
 
     if (result.value) {
       const { variant, blob } = result.value;
-      const safePortraitName =
-        portraitName.replace(/[^a-zA-Z0-9.\-_ ]/g, "").trim() || preset.exportConfig.defaultName;
-      let finalFilename = variant.filename.replace("{name}", safePortraitName);
-      finalFilename = finalFilename.replace(/[^a-zA-Z0-9.\-_]/g, "");
-
-      const zipPath = preset.exportConfig.wrapInFolder
-        ? `${safePortraitName}/${finalFilename}`
-        : finalFilename;
+      const filename = variant.filename.replace("{name}", portraitName);
+      const zipPath = preset.exportConfig.wrapInFolder ? `${portraitName}/${filename}` : filename;
       zip.file(zipPath, blob);
     }
   }

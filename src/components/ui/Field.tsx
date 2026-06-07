@@ -169,7 +169,7 @@ function FieldError({
   errors,
   ...props
 }: React.ComponentProps<"div"> & {
-  errors?: Array<string | undefined> | string;
+  errors?: Array<string | { message?: string } | undefined> | string;
 }) {
   const content = useMemo(() => {
     if (children) {
@@ -188,8 +188,20 @@ function FieldError({
       return null;
     }
 
-    const uniqueErrors = [...new Set(errors).values()];
-    if (uniqueErrors?.length == 1) {
+    const uniqueErrors = [
+      ...new Set(
+        errors
+          .values()
+          .map((error) => (typeof error === "string" ? error : error?.message))
+          .filter(Boolean),
+      ),
+    ];
+
+    if (!uniqueErrors.length) {
+      return null;
+    }
+
+    if (uniqueErrors.length === 1) {
       return uniqueErrors[0];
     }
 

@@ -53,6 +53,8 @@ export type Preset = Omit<v.InferOutput<typeof presetSchema>, "variants"> & {
   variants: PortraitVariant[];
 };
 
+export type PortraitExportFormat = PortraitVariant["format"];
+
 const OwlcatNotes = ({ path }: { path: string }) => (
   <>
     <p>
