@@ -11,7 +11,7 @@ export default async function EditorLayout({
   params: Promise<{ presetId: string }>;
 }) {
   const { presetId } = await params;
-  const preset = PRESETS.find((g) => g.id === presetId);
+  const preset = PRESETS.find((p) => p.id === presetId);
 
   return (
     <div className="relative flex flex-1 flex-col">

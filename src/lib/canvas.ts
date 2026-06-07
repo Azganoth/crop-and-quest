@@ -1,3 +1,7 @@
+import type { PortraitVariant } from "@/data/presets";
+import type { CropArea } from "@/store/usePortraitStore";
+import { encodeBMP, encodeTGA } from "./encoders";
+
 export function loadImageFromUrl(url: string): Promise<HTMLImageElement> {
   const { promise, resolve, reject } = Promise.withResolvers<HTMLImageElement>();
 
@@ -16,14 +20,14 @@ export function loadImageFromUrl(url: string): Promise<HTMLImageElement> {
 export function degreesToRadians(degreeValue: number): number {
   return (degreeValue * Math.PI) / 180;
 }
-import { encodeBMP, encodeTGA } from "./encoders";
+
 export async function exportCroppedImage(
   imageSrc: string,
-  pixelCrop: { x: number; y: number; width: number; height: number },
+  pixelCrop: CropArea,
   rotation = 0,
   variantWidth: number,
   variantHeight: number,
-  format: "png" | "jpeg" | "webp" | "bmp" | "tga" = "png",
+  format: PortraitVariant["format"] = "png",
   quality = 1.0,
 ): Promise<string> {
   const image = await loadImageFromUrl(imageSrc);

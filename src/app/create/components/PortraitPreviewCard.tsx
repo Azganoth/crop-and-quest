@@ -20,7 +20,7 @@ export function PortraitPreviewCard({
   crop,
   isUniformMode,
 }: PortraitPreviewCardProps) {
-  const hasCrop = !!crop?.croppedBlobUrl;
+  const croppedBlobUrl = crop?.croppedBlobUrl;
 
   return (
     <article
@@ -43,19 +43,19 @@ export function PortraitPreviewCard({
         }
       >
         <div className="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]" />
-        {hasCrop && (
+        {croppedBlobUrl && (
           <>
             <div
               className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
-              style={{ backgroundImage: `url(${crop.croppedBlobUrl})` }}
+              style={{ backgroundImage: `url(${croppedBlobUrl})` }}
             />
             <div className="absolute inset-0 bg-black/20" />
           </>
         )}
 
-        {hasCrop ? (
+        {croppedBlobUrl ? (
           <Image
-            src={crop.croppedBlobUrl!}
+            src={croppedBlobUrl}
             alt={variant.label}
             width={variant.width}
             height={variant.height}
@@ -95,7 +95,7 @@ export function PortraitPreviewCard({
           </span>
         </div>
 
-        {hasCrop && (
+        {croppedBlobUrl && (
           <div className="mt-1 flex gap-3">
             <Button variant="outline" asChild>
               <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
@@ -106,7 +106,7 @@ export function PortraitPreviewCard({
             <Button
               variant="outline"
               className="flex-1"
-              onClick={() => triggerDownload(crop.croppedBlobUrl!, variant.filename)}
+              onClick={() => triggerDownload(croppedBlobUrl, variant.filename)}
             >
               <Download className="mr-1 size-5 shrink-0" />
               <span className="truncate">Download</span>

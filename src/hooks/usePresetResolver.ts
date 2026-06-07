@@ -6,13 +6,19 @@ export function usePresetResolver(presetId: string | undefined) {
   const isMounted = useMounted();
   const customPresets = useCustomPresetsStore((s) => s.customPresets);
 
-  if (!presetId) return { preset: undefined, isLoading: false };
+  if (!presetId) {
+    return { preset: undefined, isLoading: false };
+  }
 
-  const officialPreset = PRESETS.find((g) => g.id === presetId);
-  if (officialPreset) return { preset: officialPreset, isLoading: false };
+  const officialPreset = PRESETS.find((p) => p.id === presetId);
+  if (officialPreset) {
+    return { preset: officialPreset, isLoading: false };
+  }
 
-  if (!isMounted) return { preset: undefined, isLoading: true };
+  if (!isMounted) {
+    return { preset: undefined, isLoading: true };
+  }
 
-  const customPreset = customPresets.find((g) => g.id === presetId);
+  const customPreset = customPresets.find((p) => p.id === presetId);
   return { preset: customPreset, isLoading: false };
 }

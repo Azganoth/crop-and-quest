@@ -1,17 +1,19 @@
 import { create } from "zustand";
 
+export interface CropArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface CropState {
   x: number;
   y: number;
   zoom: number;
   rotation: number;
   croppedBlobUrl?: string;
-  croppedAreaPixels?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
+  croppedAreaPixels?: CropArea;
 }
 
 export type CropStateMap = Record<string, CropState>;

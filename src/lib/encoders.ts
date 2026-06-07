@@ -1,7 +1,3 @@
-/**
- * Custom zero-dependency encoders for legacy formats required by classic CRPGs.
- */
-
 export function encodeBMP(imageData: ImageData): Blob {
   const { width, height, data } = imageData;
 

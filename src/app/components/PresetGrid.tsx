@@ -56,19 +56,19 @@ function PresetCard({
                 <Trash2 className="size-4" />
               </Button>
             </ConfirmationDialogTrigger>
-          <ConfirmationDialogContent
-            title="Delete Custom Preset"
-            onConfirm={() => {
-              setIsDialogOpen(false);
-              if (onDelete) {
-                setTimeout(onDelete, 200);
-              }
-            }}
-          >
-            Are you sure you want to delete <strong>{preset.name}</strong>? This action cannot be
-            undone.
-          </ConfirmationDialogContent>
-        </ConfirmationDialog>
+            <ConfirmationDialogContent
+              title="Delete Custom Preset"
+              onConfirm={() => {
+                setIsDialogOpen(false);
+                if (onDelete) {
+                  setTimeout(onDelete, 200);
+                }
+              }}
+            >
+              Are you sure you want to delete <strong>{preset.name}</strong>? This action cannot be
+              undone.
+            </ConfirmationDialogContent>
+          </ConfirmationDialog>
         </div>
       )}
       <Link

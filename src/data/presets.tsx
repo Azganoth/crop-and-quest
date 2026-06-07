@@ -1,6 +1,3 @@
-import { StaticImageData } from "next/image";
-import React from "react";
-
 import coverArcanum from "@/assets/arcanum.jpg";
 import coverBg1 from "@/assets/baldurs-gate-1.jpg";
 import coverBg2 from "@/assets/baldurs-gate-2.jpg";
@@ -21,32 +18,40 @@ import coverSrReturns from "@/assets/shadowrun-returns.jpg";
 import coverTyranny from "@/assets/tyranny.jpg";
 import coverWasteland2 from "@/assets/wasteland-2.jpg";
 import coverWasteland3 from "@/assets/wasteland-3.jpg";
+import type { StaticImageData } from "next/image";
+import * as v from "valibot";
 
-export interface PortraitVariant {
-  key: string;
-  label: string;
-  width: number;
-  height: number;
-  format: "png" | "jpeg" | "webp" | "bmp" | "tga";
-  quality?: number;
-  filename: string;
-  optional?: boolean;
-}
+export const presetVariantSchema = v.object({
+  key: v.string(),
+  label: v.pipe(v.string(), v.trim(), v.minLength(1, "Label is required")),
+  width: v.pipe(v.number(), v.minValue(1, "Must be > 0")),
+  height: v.pipe(v.number(), v.minValue(1, "Must be > 0")),
+  format: v.picklist(["png", "jpeg", "webp", "bmp", "tga"], "Invalid format"),
+  filename: v.pipe(v.string(), v.trim()),
+  quality: v.optional(v.pipe(v.number(), v.minValue(1), v.maxValue(100))),
+  optional: v.optional(v.boolean()),
+});
 
-export interface Preset {
-  id: string;
-  name: string;
-  description?: string;
-  cover?: StaticImageData;
-  exportConfig: {
-    wrapInFolder: boolean;
-    defaultName: string;
-    maxLength?: number;
-  };
+export const presetSchema = v.object({
+  id: v.string(),
+  name: v.pipe(v.string(), v.trim(), v.minLength(1, "Preset name is required")),
+  variants: v.pipe(
+    v.array(presetVariantSchema),
+    v.minLength(1, "At least one variant is required"),
+  ),
+  cover: v.optional(v.custom<StaticImageData>(() => true)),
+  installNotes: v.optional(v.custom<React.ReactNode>(() => true)),
+  exportConfig: v.object({
+    wrapInFolder: v.boolean(),
+    defaultName: v.pipe(v.string(), v.trim()),
+    maxLength: v.optional(v.pipe(v.number(), v.minValue(1, "Must be > 0"))),
+  }),
+});
+
+export type PortraitVariant = v.InferOutput<typeof presetVariantSchema>;
+export type Preset = Omit<v.InferOutput<typeof presetSchema>, "variants"> & {
   variants: PortraitVariant[];
-  installNotes?: React.ReactNode;
-  sourceUrl?: string;
-}
+};
 
 const OwlcatNotes = ({ path }: { path: string }) => (
   <>
