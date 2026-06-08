@@ -123,12 +123,19 @@ export function CustomPresetForm({
             finalFilename = finalFilename.slice(0, -(v.format.length + 1));
           }
 
-          if (finalFilename) {
-            if (!finalFilename.includes("{name}")) {
-              finalFilename = `{name}${finalFilename}`;
+          if (parsedValue.wrapInFolder) {
+            finalFilename = finalFilename.replace(/\{name\}/g, "").trim();
+            if (!finalFilename) {
+              finalFilename = v.label.replace(/[^a-zA-Z0-9.\-_ ]/g, "").replace(/\s+/g, "_");
             }
           } else {
-            finalFilename = `{name}`;
+            if (finalFilename) {
+              if (!finalFilename.includes("{name}")) {
+                finalFilename = `{name}${finalFilename}`;
+              }
+            } else {
+              finalFilename = `{name}`;
+            }
           }
 
           return {
@@ -398,24 +405,35 @@ export function CustomPresetForm({
                               </FormField>
                             )}
                           </form.AppField>
-                          <form.AppField name={`variants[${i}].filename`}>
-                            {(subField) => (
-                              <FormField className="md:col-span-2">
-                                <FormFieldLabel>Filename Suffix / Override</FormFieldLabel>
-                                <FormFieldControl>
-                                  <Input
-                                    name={subField.name}
-                                    value={subField.state.value}
-                                    onBlur={subField.handleBlur}
-                                    onChange={(e) => subField.handleChange(e.target.value)}
-                                    placeholder="e.g. _L (appends to portrait name)"
-                                    autoComplete="off"
-                                  />
-                                </FormFieldControl>
-                                <FormFieldError />
-                              </FormField>
+                          <form.Subscribe selector={(state) => state.values.wrapInFolder}>
+                            {(wrapInFolder) => (
+                              <form.AppField name={`variants[${i}].filename`}>
+                                {(subField) => (
+                                  <FormField className="md:col-span-2">
+                                    <FormFieldLabel>Filename Base</FormFieldLabel>
+                                    <FormFieldDescription className="text-xs">
+                                      {wrapInFolder
+                                        ? "Folder acts as name. E.g. 'Large' -> 'Bob/Large.png'"
+                                        : "Use {name} token. E.g. '{name}_L' -> 'Bob_L.png'"}
+                                    </FormFieldDescription>
+                                    <FormFieldControl>
+                                      <Input
+                                        name={subField.name}
+                                        value={subField.state.value}
+                                        onBlur={subField.handleBlur}
+                                        onChange={(e) => subField.handleChange(e.target.value)}
+                                        placeholder={
+                                          wrapInFolder ? "e.g. Fulllength" : "e.g. {name}_L"
+                                        }
+                                        autoComplete="off"
+                                      />
+                                    </FormFieldControl>
+                                    <FormFieldError />
+                                  </FormField>
+                                )}
+                              </form.AppField>
                             )}
-                          </form.AppField>
+                          </form.Subscribe>
                         </FieldGroup>
                       </FieldSet>
                     ))}
