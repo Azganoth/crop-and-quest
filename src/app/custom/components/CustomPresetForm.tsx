@@ -411,7 +411,7 @@ export function CustomPresetForm({
                                 {(subField) => (
                                   <FormField className="md:col-span-2">
                                     <FormFieldLabel>Filename Base</FormFieldLabel>
-                                    <FormFieldDescription className="text-xs">
+                                    <FormFieldDescription>
                                       {wrapInFolder
                                         ? "Folder acts as name. E.g. 'Large' -> 'Bob/Large.png'"
                                         : "Use {name} token. E.g. '{name}_L' -> 'Bob_L.png'"}
