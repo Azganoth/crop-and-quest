@@ -2,6 +2,15 @@
 
 import { PortraitPreviewCard } from "@/app/create/components/PortraitPreviewCard";
 import {
+  Form,
+  FormField,
+  FormFieldControl,
+  FormFieldError,
+  FormFieldLabel,
+  FormSubmitButton,
+  useAppForm,
+} from "@/components/Form";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogContent,
@@ -11,7 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/AlertDialog";
 import { Button } from "@/components/ui/Button";
-import { Field, FieldError, FieldLabel, FieldTitle } from "@/components/ui/Field";
+import { Field, FieldTitle } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Panel } from "@/components/ui/Panel";
 import { Separator } from "@/components/ui/Separator";
@@ -21,7 +30,6 @@ import { useMounted } from "@/hooks/useMounted";
 import { generatePresetZip } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { useForm } from "@tanstack/react-form";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -70,7 +78,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
     [preset.exportConfig.maxLength],
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: { portraitName: preset.exportConfig.defaultName },
     validators: {
       onChange: portraitNameSchema,
@@ -163,63 +171,41 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           />
         )}
       </Field>
-      <form
-        className="sticky bottom-4 z-50 mx-auto w-full max-w-4xl pt-6 pb-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
-      >
-        <Panel className="flex flex-col items-center justify-between gap-4 bg-background/95 px-6 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] backdrop-blur supports-backdrop-filter:bg-background/80 md:flex-row dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
-          <form.Field name="portraitName">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
-              return (
-                <Field orientation="horizontal" className="w-auto" data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Portrait Name</FieldLabel>
+      <form.AppForm>
+        <Form className="sticky bottom-4 z-50 mx-auto w-full max-w-4xl pt-6 pb-2">
+          <Panel className="flex flex-col items-center justify-between gap-4 bg-background/95 px-6 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] backdrop-blur supports-backdrop-filter:bg-background/80 md:flex-row dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
+            <form.AppField name="portraitName">
+              {(field) => (
+                <FormField orientation="horizontal" className="w-auto">
+                  <FormFieldLabel>Portrait Name</FormFieldLabel>
                   <div className="relative flex flex-col">
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      aria-invalid={isInvalid}
-                      className="w-48 bg-background font-mono"
-                      placeholder={preset.exportConfig.defaultName}
-                      autoComplete="off"
-                    />
-                    <FieldError
-                      className="absolute top-full mt-1"
-                      errors={field.state.meta.errors}
-                    />
+                    <FormFieldControl>
+                      <Input
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="w-48 bg-background font-mono"
+                        placeholder={preset.exportConfig.defaultName}
+                        autoComplete="off"
+                      />
+                    </FormFieldControl>
+                    <FormFieldError className="absolute top-full mt-1" />
                   </div>
-                </Field>
-              );
-            }}
-          </form.Field>
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <Button
-                type="submit"
-                disabled={!canSubmit || Object.keys(crops).length !== preset.variants.length}
-                size="lg"
-                className="w-full shadow-lg md:w-auto"
-              >
-                {isSubmitting ? (
-                  "Packaging..."
-                ) : (
-                  <>
-                    <FileArchive className="mr-1 size-5" />
-                    Download All
-                  </>
-                )}
-              </Button>
-            )}
-          </form.Subscribe>
-        </Panel>
-      </form>
+                </FormField>
+              )}
+            </form.AppField>
+            <FormSubmitButton
+              disabled={Object.keys(crops).length !== preset.variants.length}
+              size="lg"
+              className="w-full shadow-lg md:w-auto"
+            >
+              <FileArchive className="mr-1 size-5" />
+              Download All
+            </FormSubmitButton>
+          </Panel>
+        </Form>
+      </form.AppForm>
 
       <Separator className="my-12" />
 

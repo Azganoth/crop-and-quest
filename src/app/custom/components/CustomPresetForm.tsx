@@ -1,16 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
 import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/Field";
+  Form,
+  FormField,
+  FormFieldControl,
+  FormFieldDescription,
+  FormFieldError,
+  FormFieldLabel,
+  FormGlobalError,
+  FormSubmitButton,
+  useAppForm,
+} from "@/components/Form";
+import { Button } from "@/components/ui/Button";
+import { FieldContent, FieldGroup, FieldLegend, FieldSet } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Panel } from "@/components/ui/Panel";
 import {
@@ -26,7 +28,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip
 import { Preset, type PortraitExportFormat } from "@/data/presets";
 import { getAspectRatioString } from "@/lib/math";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
-import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -99,7 +100,7 @@ export function CustomPresetForm({
     [initialData],
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues,
     validators: {
       onSubmit: presetInputSchema,
@@ -160,254 +161,214 @@ export function CustomPresetForm({
         </p>
       </header>
 
-      <form
-        className="flex flex-col gap-8"
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
-      >
-        <Panel asChild>
-          <section>
-            <h2 className="font-display text-xl font-bold">General Settings</h2>
-            <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <form.Field name="name">
-                {(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Preset Name</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="e.g. Arcanum"
-                        autoComplete="off"
-                      />
-                      <FieldError errors={field.state.meta.errors} />
-                    </Field>
-                  );
-                }}
-              </form.Field>
-              <form.Field name="defaultName">
-                {(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Default Portrait Name</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        placeholder="e.g. PORTRAIT"
-                        autoComplete="off"
-                      />
-                      <FieldError errors={field.state.meta.errors} />
-                    </Field>
-                  );
-                }}
-              </form.Field>
-              <form.Field name="maxLength">
-                {(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>Max Filename Length (Optional)</FieldLabel>
-                      <Input
-                        type="number"
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        aria-invalid={isInvalid}
-                        autoComplete="off"
-                      />
-                      <FieldError errors={field.state.meta.errors} />
-                    </Field>
-                  );
-                }}
-              </form.Field>
-              <form.Field name="wrapInFolder">
-                {(field) => {
-                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
-                  return (
-                    <Field orientation="horizontal" data-invalid={isInvalid}>
+      <form.AppForm>
+        <Form className="flex flex-col gap-8">
+          <Panel asChild>
+            <section>
+              <h2 className="font-display text-xl font-bold">General Settings</h2>
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <form.AppField name="name">
+                  {(field) => (
+                    <FormField>
+                      <FormFieldLabel>Preset Name</FormFieldLabel>
+                      <FormFieldControl>
+                        <Input
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="e.g. Arcanum"
+                          autoComplete="off"
+                        />
+                      </FormFieldControl>
+                      <FormFieldError />
+                    </FormField>
+                  )}
+                </form.AppField>
+                <form.AppField name="defaultName">
+                  {(field) => (
+                    <FormField>
+                      <FormFieldLabel>Default Portrait Name</FormFieldLabel>
+                      <FormFieldControl>
+                        <Input
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="e.g. PORTRAIT"
+                          autoComplete="off"
+                        />
+                      </FormFieldControl>
+                      <FormFieldError />
+                    </FormField>
+                  )}
+                </form.AppField>
+                <form.AppField name="maxLength">
+                  {(field) => (
+                    <FormField>
+                      <FormFieldLabel>Max Filename Length (Optional)</FormFieldLabel>
+                      <FormFieldControl>
+                        <Input
+                          type="number"
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          autoComplete="off"
+                        />
+                      </FormFieldControl>
+                      <FormFieldError errors={field.state.meta.errors} />
+                    </FormField>
+                  )}
+                </form.AppField>
+                <form.AppField name="wrapInFolder">
+                  {(field) => (
+                    <FormField orientation="horizontal">
                       <FieldContent>
-                        <FieldLabel htmlFor={field.name}>Wrap in Folder</FieldLabel>
-                        <FieldDescription>
+                        <FormFieldLabel>Wrap in Folder</FormFieldLabel>
+                        <FormFieldDescription>
                           Places the images inside a folder in the ZIP.
-                        </FieldDescription>
-                        <FieldError errors={field.state.meta.errors} />
+                        </FormFieldDescription>
+                        <FormFieldError />
                       </FieldContent>
-                      <Switch
-                        id={field.name}
-                        name={field.name}
-                        checked={field.state.value}
-                        onCheckedChange={field.handleChange}
-                        onBlur={field.handleBlur}
-                        aria-invalid={isInvalid}
-                      />
-                    </Field>
-                  );
-                }}
-              </form.Field>
-            </FieldGroup>
-          </section>
-        </Panel>
+                      <FormFieldControl>
+                        <Switch
+                          name={field.name}
+                          checked={field.state.value}
+                          onCheckedChange={field.handleChange}
+                          onBlur={field.handleBlur}
+                        />
+                      </FormFieldControl>
+                    </FormField>
+                  )}
+                </form.AppField>
+              </FieldGroup>
+            </section>
+          </Panel>
 
-        <form.Field name="variants" mode="array">
-          {(field) => (
-            <Panel asChild>
-              <section>
-                <div className="flex items-center justify-between">
-                  <h2 className="font-display text-xl font-bold">Portrait Variants</h2>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => field.pushValue(getDefaultVariant())}
-                  >
-                    <Plus className="mr-1 size-5" />
-                    Add Variant
-                  </Button>
-                </div>
-
-                <div className="flex flex-col gap-6">
-                  {field.state.value.map((variant, i, arr) => (
-                    <FieldSet
-                      key={i}
-                      className="rounded-lg border border-border/50 bg-background/50 p-4"
+          <form.AppField name="variants" mode="array">
+            {(field) => (
+              <Panel asChild>
+                <section>
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-display text-xl font-bold">Portrait Variants</h2>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => field.pushValue(getDefaultVariant())}
                     >
-                      <div className="flex min-h-10 items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <FieldLegend className="font-bold text-muted-foreground">
-                            Variant {arr.length - i}
-                          </FieldLegend>
-                          {variant.width && variant.height && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div
-                                  className="border border-border bg-secondary shadow-sm"
-                                  style={{
-                                    aspectRatio: `${variant.width} / ${variant.height}`,
-                                    height: "32px",
-                                  }}
-                                />
-                              </TooltipTrigger>
-                              <TooltipContent side="right">
-                                <span className="font-semibold capitalize">Aspect Ratio</span>
-                                <span className="ml-2 font-medium text-muted-foreground">
-                                  {getAspectRatioString(
-                                    Number(variant.width),
-                                    Number(variant.height),
-                                  )}
-                                </span>
-                              </TooltipContent>
-                            </Tooltip>
+                      <Plus className="mr-1 size-5" />
+                      Add Variant
+                    </Button>
+                  </div>
+
+                  <div className="flex flex-col gap-6">
+                    {field.state.value.map((variant, i, arr) => (
+                      <FieldSet
+                        key={i}
+                        className="rounded-lg border border-border/50 bg-background/50 p-4"
+                      >
+                        <div className="flex min-h-10 items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <FieldLegend className="font-bold text-muted-foreground">
+                              Variant {arr.length - i}
+                            </FieldLegend>
+                            {variant.width && variant.height && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div
+                                    className="border border-border bg-secondary shadow-sm"
+                                    style={{
+                                      aspectRatio: `${variant.width} / ${variant.height}`,
+                                      height: "32px",
+                                    }}
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                  <span className="font-semibold capitalize">Aspect Ratio</span>
+                                  <span className="ml-2 font-medium text-muted-foreground">
+                                    {getAspectRatioString(
+                                      Number(variant.width),
+                                      Number(variant.height),
+                                    )}
+                                  </span>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                          {arr.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              onClick={() => field.removeValue(i)}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
                           )}
                         </div>
-                        {arr.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            onClick={() => field.removeValue(i)}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                        )}
-                      </div>
 
-                      <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
-                        <form.Field name={`variants[${i}].label`}>
-                          {(subField) => {
-                            const isInvalid =
-                              subField.state.meta.isTouched && !subField.state.meta.isValid;
-
-                            return (
-                              <Field className="md:col-span-2" data-invalid={isInvalid}>
-                                <FieldLabel htmlFor={subField.name}>Label</FieldLabel>
-                                <Input
-                                  id={subField.name}
-                                  name={subField.name}
-                                  value={subField.state.value}
-                                  onBlur={subField.handleBlur}
-                                  onChange={(e) => subField.handleChange(e.target.value)}
-                                  aria-invalid={isInvalid}
-                                  placeholder="e.g. Large Portrait"
-                                  autoComplete="off"
-                                />
-                                <FieldError errors={subField.state.meta.errors} />
-                              </Field>
-                            );
-                          }}
-                        </form.Field>
-                        <form.Field name={`variants[${i}].width`}>
-                          {(subField) => {
-                            const isInvalid =
-                              subField.state.meta.isTouched && !subField.state.meta.isValid;
-
-                            return (
-                              <Field data-invalid={isInvalid}>
-                                <FieldLabel htmlFor={subField.name}>Width (px)</FieldLabel>
-                                <Input
-                                  type="number"
-                                  id={subField.name}
-                                  name={subField.name}
-                                  value={subField.state.value}
-                                  onBlur={subField.handleBlur}
-                                  onChange={(e) => subField.handleChange(e.target.value)}
-                                  aria-invalid={isInvalid}
-                                />
-                                <FieldError errors={subField.state.meta.errors} />
-                              </Field>
-                            );
-                          }}
-                        </form.Field>
-                        <form.Field name={`variants[${i}].height`}>
-                          {(subField) => {
-                            const isInvalid =
-                              subField.state.meta.isTouched && !subField.state.meta.isValid;
-
-                            return (
-                              <Field data-invalid={isInvalid}>
-                                <FieldLabel htmlFor={subField.name}>Height (px)</FieldLabel>
-                                <Input
-                                  type="number"
-                                  id={subField.name}
-                                  name={subField.name}
-                                  value={subField.state.value}
-                                  onBlur={subField.handleBlur}
-                                  onChange={(e) => subField.handleChange(e.target.value)}
-                                  aria-invalid={isInvalid}
-                                />
-                                <FieldError errors={subField.state.meta.errors} />
-                              </Field>
-                            );
-                          }}
-                        </form.Field>
-                        <form.Field name={`variants[${i}].format`}>
-                          {(subField) => {
-                            const isInvalid =
-                              subField.state.meta.isTouched && !subField.state.meta.isValid;
-
-                            return (
-                              <Field data-invalid={isInvalid}>
+                        <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
+                          <form.AppField name={`variants[${i}].label`}>
+                            {(subField) => (
+                              <FormField className="md:col-span-2">
+                                <FormFieldLabel>Label</FormFieldLabel>
+                                <FormFieldControl>
+                                  <Input
+                                    name={subField.name}
+                                    value={subField.state.value}
+                                    onBlur={subField.handleBlur}
+                                    onChange={(e) => subField.handleChange(e.target.value)}
+                                    placeholder="e.g. Large Portrait"
+                                    autoComplete="off"
+                                  />
+                                </FormFieldControl>
+                                <FormFieldError />
+                              </FormField>
+                            )}
+                          </form.AppField>
+                          <form.AppField name={`variants[${i}].width`}>
+                            {(subField) => (
+                              <FormField>
+                                <FormFieldLabel>Width (px)</FormFieldLabel>
+                                <FormFieldControl>
+                                  <Input
+                                    type="number"
+                                    name={subField.name}
+                                    value={subField.state.value}
+                                    onBlur={subField.handleBlur}
+                                    onChange={(e) => subField.handleChange(e.target.value)}
+                                  />
+                                </FormFieldControl>
+                                <FormFieldError />
+                              </FormField>
+                            )}
+                          </form.AppField>
+                          <form.AppField name={`variants[${i}].height`}>
+                            {(subField) => (
+                              <FormField>
+                                <FormFieldLabel>Height (px)</FormFieldLabel>
+                                <FormFieldControl>
+                                  <Input
+                                    type="number"
+                                    name={subField.name}
+                                    value={subField.state.value}
+                                    onBlur={subField.handleBlur}
+                                    onChange={(e) => subField.handleChange(e.target.value)}
+                                  />
+                                </FormFieldControl>
+                                <FormFieldError />
+                              </FormField>
+                            )}
+                          </form.AppField>
+                          <form.AppField name={`variants[${i}].format`}>
+                            {(subField) => (
+                              <FormField>
                                 <FieldContent>
-                                  <FieldLabel htmlFor={subField.name}>Format</FieldLabel>
-                                  <FieldError errors={subField.state.meta.errors} />
+                                  <FormFieldLabel>Format</FormFieldLabel>
+                                  <FormFieldError />
                                 </FieldContent>
                                 <Select
                                   value={subField.state.value}
@@ -415,9 +376,11 @@ export function CustomPresetForm({
                                     subField.handleChange(val as PortraitExportFormat);
                                   }}
                                 >
-                                  <SelectTrigger id={subField.name} aria-invalid={isInvalid}>
-                                    <SelectValue />
-                                  </SelectTrigger>
+                                  <FormFieldControl>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                  </FormFieldControl>
                                   <SelectContent>
                                     <SelectGroup>
                                       <SelectItem value="png">PNG</SelectItem>
@@ -428,57 +391,54 @@ export function CustomPresetForm({
                                     </SelectGroup>
                                   </SelectContent>
                                 </Select>
-                              </Field>
-                            );
-                          }}
-                        </form.Field>
-                        <form.Field name={`variants[${i}].filename`}>
-                          {(subField) => {
-                            const isInvalid =
-                              subField.state.meta.isTouched && !subField.state.meta.isValid;
+                              </FormField>
+                            )}
+                          </form.AppField>
+                          <form.AppField name={`variants[${i}].filename`}>
+                            {(subField) => (
+                              <FormField className="md:col-span-2">
+                                <FormFieldLabel>Filename Suffix / Override</FormFieldLabel>
+                                <FormFieldControl>
+                                  <Input
+                                    name={subField.name}
+                                    value={subField.state.value}
+                                    onBlur={subField.handleBlur}
+                                    onChange={(e) => subField.handleChange(e.target.value)}
+                                    placeholder="e.g. _L (appends to portrait name)"
+                                    autoComplete="off"
+                                  />
+                                </FormFieldControl>
+                                <FormFieldError />
+                              </FormField>
+                            )}
+                          </form.AppField>
+                        </FieldGroup>
+                      </FieldSet>
+                    ))}
+                  </div>
+                </section>
+              </Panel>
+            )}
+          </form.AppField>
 
-                            return (
-                              <Field className="md:col-span-2" data-invalid={isInvalid}>
-                                <FieldLabel htmlFor={subField.name}>
-                                  Filename Suffix / Override
-                                </FieldLabel>
-                                <Input
-                                  id={subField.name}
-                                  name={subField.name}
-                                  value={subField.state.value}
-                                  onBlur={subField.handleBlur}
-                                  onChange={(e) => subField.handleChange(e.target.value)}
-                                  aria-invalid={isInvalid}
-                                  placeholder="e.g. _L (appends to portrait name)"
-                                  autoComplete="off"
-                                />
-                                <FieldError errors={subField.state.meta.errors} />
-                              </Field>
-                            );
-                          }}
-                        </form.Field>
-                      </FieldGroup>
-                    </FieldSet>
-                  ))}
-                </div>
-              </section>
-            </Panel>
-          )}
-        </form.Field>
+          <FormGlobalError>
+            {(errors) => (
+              <Panel className="border-destructive/50 bg-destructive/10 p-4 text-center">
+                <p className="font-medium text-destructive">{errors.join(", ")}</p>
+              </Panel>
+            )}
+          </FormGlobalError>
 
-        <form.Subscribe selector={(state) => [state.canSubmit]}>
-          {([canSubmit]) => (
-            <div className="flex justify-end gap-4">
-              <Button type="button" variant="ghost" size="lg" asChild>
-                <Link href="/">Cancel</Link>
-              </Button>
-              <Button type="submit" size="lg" disabled={!canSubmit}>
-                {mode === "create" ? "Save and Continue" : "Save Changes"}
-              </Button>
-            </div>
-          )}
-        </form.Subscribe>
-      </form>
+          <div className="flex justify-end gap-4">
+            <Button type="button" variant="ghost" size="lg" asChild>
+              <Link href="/">Cancel</Link>
+            </Button>
+            <FormSubmitButton size="lg">
+              {mode === "create" ? "Save and Continue" : "Save Changes"}
+            </FormSubmitButton>
+          </div>
+        </Form>
+      </form.AppForm>
     </div>
   );
 }
