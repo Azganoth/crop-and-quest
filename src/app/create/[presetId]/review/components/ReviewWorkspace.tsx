@@ -27,7 +27,7 @@ import { Separator } from "@/components/ui/Separator";
 import { Switch } from "@/components/ui/Switch";
 import { Preset } from "@/data/presets";
 import { useMounted } from "@/hooks/useMounted";
-import { generatePresetZip } from "@/lib/export";
+import { generatePresetZip, resolveVariantFilename, triggerDownload } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
@@ -129,8 +129,16 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
               key={variant.key}
               presetId={preset.id}
               variant={variant}
-              crop={crops[variant.key]}
+              cropUrl={crops[variant.key]?.croppedBlobUrl}
               isUniformMode={isUniformMode}
+              onDownload={(cropUrl) => {
+                const result = v.safeParse(portraitNameSchema, form.state.values);
+                const safeName = result.success
+                  ? result.output.portraitName
+                  : preset.exportConfig.defaultName;
+                const filename = resolveVariantFilename(variant, safeName);
+                triggerDownload(cropUrl, filename);
+              }}
             />
           ))}
       </div>

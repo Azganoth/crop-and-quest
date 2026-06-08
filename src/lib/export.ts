@@ -1,6 +1,11 @@
+import type { PortraitVariant } from "@/data/presets";
 import { Preset } from "@/data/presets";
 import { CropState } from "@/store/usePortraitStore";
 import JSZip from "jszip";
+
+export function resolveVariantFilename(variant: PortraitVariant, portraitName: string): string {
+  return `${variant.filename.replace("{name}", portraitName)}.${variant.format}`;
+}
 
 export async function generatePresetZip(
   preset: Preset,
@@ -37,7 +42,7 @@ export async function generatePresetZip(
 
     if (result.value) {
       const { variant, blob } = result.value;
-      const filename = `${variant.filename.replace("{name}", portraitName)}.${variant.format}`;
+      const filename = resolveVariantFilename(variant, portraitName);
       const zipPath = preset.exportConfig.wrapInFolder ? `${portraitName}/${filename}` : filename;
       zip.file(zipPath, blob);
     }

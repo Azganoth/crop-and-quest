@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import type { PortraitVariant } from "@/data/presets";
 import { cn } from "@/lib/cn";
-import { triggerDownload } from "@/lib/export";
-import type { CropState } from "@/store/usePortraitStore";
 import { Download, Edit2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,18 +8,18 @@ import Link from "next/link";
 interface PortraitPreviewCardProps {
   presetId: string;
   variant: PortraitVariant;
-  crop?: CropState;
+  cropUrl?: string;
   isUniformMode?: boolean;
+  onDownload?: (cropUrl: string) => void;
 }
 
 export function PortraitPreviewCard({
   presetId,
   variant,
-  crop,
+  cropUrl,
   isUniformMode,
+  onDownload,
 }: PortraitPreviewCardProps) {
-  const croppedBlobUrl = crop?.croppedBlobUrl;
-
   return (
     <article
       className={cn(
@@ -43,19 +41,19 @@ export function PortraitPreviewCard({
         }
       >
         <div className="pointer-events-none absolute inset-0 z-20 shadow-[inset_0_0_40px_rgba(0,0,0,0.5)]" />
-        {croppedBlobUrl && (
+        {cropUrl && (
           <>
             <div
               className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
-              style={{ backgroundImage: `url(${croppedBlobUrl})` }}
+              style={{ backgroundImage: `url(${cropUrl})` }}
             />
             <div className="absolute inset-0 bg-black/20" />
           </>
         )}
 
-        {croppedBlobUrl ? (
+        {cropUrl ? (
           <Image
-            src={croppedBlobUrl}
+            src={cropUrl}
             alt={variant.label}
             width={variant.width}
             height={variant.height}
@@ -77,9 +75,9 @@ export function PortraitPreviewCard({
         ) : (
           <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
             <span className="font-semibold">Skipped</span>
-            <Button variant="secondary" className="mt-6" asChild>
+            <Button variant="secondary" size="lg" className="mt-6" asChild>
               <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
-                <Edit2 className="mr-2 size-4" />
+                <Edit2 className="mr-1 size-5" />
                 Crop Variant
               </Link>
             </Button>
@@ -95,7 +93,7 @@ export function PortraitPreviewCard({
           </span>
         </div>
 
-        {croppedBlobUrl && (
+        {cropUrl && (
           <div className="mt-1 flex gap-3">
             <Button variant="outline" asChild>
               <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
@@ -103,14 +101,18 @@ export function PortraitPreviewCard({
                 <span className="truncate">Edit</span>
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => triggerDownload(croppedBlobUrl, variant.filename)}
-            >
-              <Download className="mr-1 size-5 shrink-0" />
-              <span className="truncate">Download</span>
-            </Button>
+            {onDownload && (
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  onDownload(cropUrl);
+                }}
+              >
+                <Download className="mr-1 size-5 shrink-0" />
+                <span className="truncate">Download</span>
+              </Button>
+            )}
           </div>
         )}
       </div>
