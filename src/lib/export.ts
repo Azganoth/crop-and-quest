@@ -37,7 +37,7 @@ export async function generatePresetZip(
 
     if (result.value) {
       const { variant, blob } = result.value;
-      const filename = variant.filename.replace("{name}", portraitName);
+      const filename = `${variant.filename.replace("{name}", portraitName)}.${variant.format}`;
       const zipPath = preset.exportConfig.wrapInFolder ? `${portraitName}/${filename}` : filename;
       zip.file(zipPath, blob);
     }

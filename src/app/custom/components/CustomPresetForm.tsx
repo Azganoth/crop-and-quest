@@ -64,7 +64,7 @@ const getDefaultVariant = (): PresetVariantInput => ({
   width: "256",
   height: "256",
   format: "png",
-  filename: "{name}.png",
+  filename: "{name}",
   optional: false,
 });
 
@@ -119,12 +119,16 @@ export function CustomPresetForm({
         },
         variants: parsedValue.variants.map((v, i) => {
           let finalFilename = v.filename;
+          if (finalFilename.endsWith(`.${v.format}`)) {
+            finalFilename = finalFilename.slice(0, -(v.format.length + 1));
+          }
+
           if (finalFilename) {
             if (!finalFilename.includes("{name}")) {
-              finalFilename = `{name}${finalFilename}.${v.format}`;
+              finalFilename = `{name}${finalFilename}`;
             }
           } else {
-            finalFilename = `{name}.${v.format}`;
+            finalFilename = `{name}`;
           }
 
           return {
