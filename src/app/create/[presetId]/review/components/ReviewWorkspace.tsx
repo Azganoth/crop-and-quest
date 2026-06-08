@@ -32,7 +32,7 @@ import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import * as v from "valibot";
 
 const buildPortraitNameSchema = (maxLength: number) =>
@@ -52,26 +52,10 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const router = useRouter();
 
   const { crops, clearSession } = usePortraitStore();
-  const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const { isUniformMode, setUniformMode } = useSettingsStore();
   const isMounted = useMounted();
-
-  useEffect(() => {
-    if (zipBlobUrl) {
-      URL.revokeObjectURL(zipBlobUrl);
-      setZipBlobUrl(null);
-    }
-  }, [crops, zipBlobUrl]);
-
-  // Revoking the object URL on unmount prevents memory leaks from untracked blob references.
-  useEffect(
-    () => () => {
-      if (zipBlobUrl) URL.revokeObjectURL(zipBlobUrl);
-    },
-    [zipBlobUrl],
-  );
 
   const portraitNameSchema = useMemo(
     () => buildPortraitNameSchema(preset.exportConfig.maxLength || 50),
@@ -84,20 +68,9 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
       onChange: portraitNameSchema,
     },
     onSubmit: async ({ value }) => {
-      if (zipBlobUrl) {
-        const a = document.createElement("a");
-        a.href = zipBlobUrl;
-        a.download = downloadName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        return;
-      }
-
       try {
         const zipBlob = await generatePresetZip(preset, crops, value.portraitName);
         const url = URL.createObjectURL(zipBlob);
-        setZipBlobUrl(url);
 
         const a = document.createElement("a");
         a.href = url;
@@ -105,6 +78,9 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+
+        // Revoking the object URL to prevent memory leaks from untracked blob references.
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       } catch (error) {
         console.error(error);
         const msg =
