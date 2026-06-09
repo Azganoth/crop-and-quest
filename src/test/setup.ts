@@ -2,9 +2,11 @@ import "@testing-library/jest-dom/vitest";
 
 import { cleanup } from "@testing-library/react";
 import { afterEach, vi } from "vitest";
+import { resetAppStores } from "./utils";
 
 afterEach(() => {
   cleanup();
+  resetAppStores();
 });
 
 vi.mock("next/navigation", () => ({

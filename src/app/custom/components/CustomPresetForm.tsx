@@ -34,48 +34,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import * as v from "valibot";
-
-const presetVariantInputSchema = v.object({
-  label: v.pipe(v.string(), v.trim(), v.minLength(1, "Label is required")),
-  width: v.pipe(v.string(), v.transform(Number), v.minValue(1, "Must be at least 1")),
-  height: v.pipe(v.string(), v.transform(Number), v.minValue(1, "Must be at least 1")),
-  format: v.picklist(["png", "jpeg", "webp", "bmp", "tga"], "Invalid format"),
-  filename: v.pipe(v.string(), v.trim()),
-  optional: v.boolean(),
-});
-
-const presetInputSchema = v.object({
-  name: v.pipe(v.string(), v.trim(), v.minLength(1, "Preset name is required")),
-  variants: v.pipe(
-    v.array(presetVariantInputSchema),
-    v.minLength(1, "At least one variant is required"),
-  ),
-  defaultName: v.pipe(v.string(), v.trim()),
-  maxLength: v.union([
-    v.pipe(
-      v.string(),
-      v.trim(),
-      v.literal(""),
-      v.transform(() => undefined),
-    ),
-    v.pipe(v.string(), v.transform(Number), v.minValue(1, "Must be at least 1")),
-  ]),
-  wrapInFolder: v.boolean(),
-});
-
-type PresetVariantInput = v.InferInput<typeof presetVariantInputSchema>;
-type PresetInput = Omit<v.InferInput<typeof presetInputSchema>, "variants"> & {
-  variants: PresetVariantInput[];
-};
-
-const getDefaultVariant = (): PresetVariantInput => ({
-  label: "Portrait",
-  width: "256",
-  height: "256",
-  format: "png",
-  filename: "{name}",
-  optional: false,
-});
+import { getDefaultVariant, presetInputSchema, type PresetInput } from "../schema";
 
 export function CustomPresetForm({
   mode,

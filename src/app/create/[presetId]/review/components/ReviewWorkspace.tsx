@@ -36,19 +36,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import * as v from "valibot";
 
-const buildPortraitNameSchema = (maxLength: number) =>
-  v.object({
-    portraitName: v.pipe(
-      v.string(),
-      v.trim(),
-      v.regex(
-        /^[a-zA-Z0-9.\-_ ]*$/,
-        "Invalid characters (only letters, numbers, spaces, dots, dashes, and underscores)",
-      ),
-      v.minLength(1, "Portrait name is required"),
-      v.maxLength(maxLength, `Max length is ${maxLength} characters`),
-    ),
-  });
+import { buildPortraitNameSchema } from "../../../schema";
 
 export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const router = useRouter();
