@@ -24,8 +24,8 @@ import * as v from "valibot";
 export const presetVariantSchema = v.object({
   key: v.string(),
   label: v.pipe(v.string(), v.trim(), v.minLength(1, "Label is required")),
-  width: v.pipe(v.number(), v.minValue(1, "Must be > 0")),
-  height: v.pipe(v.number(), v.minValue(1, "Must be > 0")),
+  width: v.pipe(v.number(), v.minValue(1, "Must be at least 1")),
+  height: v.pipe(v.number(), v.minValue(1, "Must be at least 1")),
   format: v.picklist(["png", "jpeg", "webp", "bmp", "tga"], "Invalid format"),
   filename: v.pipe(v.string(), v.trim()),
   quality: v.optional(v.pipe(v.number(), v.minValue(1), v.maxValue(100))),

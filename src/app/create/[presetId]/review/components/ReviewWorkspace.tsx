@@ -44,6 +44,7 @@ const buildPortraitNameSchema = (maxLength: number) =>
         /^[a-zA-Z0-9.\-_ ]*$/,
         "Invalid characters (only letters, numbers, spaces, dots, dashes, and underscores)",
       ),
+      v.minLength(1, "Portrait name is required"),
       v.maxLength(maxLength, `Max length is ${maxLength} characters`),
     ),
   });
@@ -52,7 +53,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const router = useRouter();
 
   const { crops, clearSession } = usePortraitStore();
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const { isUniformMode, setUniformMode } = useSettingsStore();
   const isMounted = useMounted();
@@ -68,8 +69,10 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
       onChange: portraitNameSchema,
     },
     onSubmit: async ({ value }) => {
+      const parsedValue = v.parse(portraitNameSchema, value);
+
       try {
-        const zipBlob = await generatePresetZip(preset, crops, value.portraitName);
+        const zipBlob = await generatePresetZip(preset, crops, parsedValue.portraitName);
         const url = URL.createObjectURL(zipBlob);
 
         const a = document.createElement("a");
@@ -83,11 +86,11 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       } catch (error) {
         console.error(error);
-        const msg =
+        const message =
           error instanceof Error
             ? error.message
             : "Failed to generate ZIP file. Please download individual files instead.";
-        setErrorMsg(msg);
+        setError(message);
       }
     },
   });
@@ -202,14 +205,14 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
         </Panel>
       )}
 
-      <AlertDialog open={!!errorMsg} onOpenChange={(open) => !open && setErrorMsg(null)}>
+      <AlertDialog open={!!error} onOpenChange={(open) => !open && setError(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Export Failed</AlertDialogTitle>
-            <AlertDialogDescription>{errorMsg}</AlertDialogDescription>
+            <AlertDialogDescription>{error}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setErrorMsg(null)}>Close</AlertDialogAction>
+            <AlertDialogAction onClick={() => setError(null)}>Close</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
