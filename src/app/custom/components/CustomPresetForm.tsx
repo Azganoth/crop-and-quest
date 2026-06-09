@@ -185,10 +185,10 @@ export function CustomPresetForm({
           <Panel asChild>
             <section>
               <h2 className="font-display text-xl font-bold">General Settings</h2>
-              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <FieldGroup className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <form.AppField name="name">
                   {(field) => (
-                    <FormField>
+                    <FormField className="md:col-span-2">
                       <FormFieldLabel>Preset Name</FormFieldLabel>
                       <FormFieldControl>
                         <Input
@@ -206,7 +206,7 @@ export function CustomPresetForm({
                 </form.AppField>
                 <form.AppField name="defaultName">
                   {(field) => (
-                    <FormField>
+                    <FormField className="md:col-span-2">
                       <FormFieldLabel>Default Portrait Name</FormFieldLabel>
                       <FormFieldControl>
                         <Input
@@ -242,7 +242,7 @@ export function CustomPresetForm({
                 </form.AppField>
                 <form.AppField name="wrapInFolder">
                   {(field) => (
-                    <FormField orientation="horizontal">
+                    <FormField orientation="horizontal" className="col-start-3 row-start-1">
                       <FieldContent>
                         <FormFieldLabel>Wrap in Folder</FormFieldLabel>
                         <FormFieldDescription>
@@ -256,6 +256,7 @@ export function CustomPresetForm({
                           checked={field.state.value}
                           onCheckedChange={field.handleChange}
                           onBlur={field.handleBlur}
+                          className="my-auto"
                         />
                       </FormFieldControl>
                     </FormField>
@@ -288,40 +289,38 @@ export function CustomPresetForm({
                         key={i}
                         className="rounded-lg border border-border/50 bg-background/50 p-4"
                       >
-                        <div className="flex min-h-10 items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <FieldLegend className="font-bold text-muted-foreground">
-                              Variant {arr.length - i}
-                            </FieldLegend>
-                            {variant.width && variant.height && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div
-                                    className="border border-border bg-secondary shadow-sm"
-                                    style={{
-                                      aspectRatio: `${variant.width} / ${variant.height}`,
-                                      height: "32px",
-                                    }}
-                                  />
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                  <span className="font-semibold capitalize">Aspect Ratio</span>
-                                  <span className="ml-2 font-medium text-muted-foreground">
-                                    {getAspectRatioString(
-                                      Number(variant.width),
-                                      Number(variant.height),
-                                    )}
-                                  </span>
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </div>
+                        <div className="flex min-h-10 items-center gap-4">
+                          <FieldLegend className="mb-0 font-bold text-muted-foreground">
+                            Variant {arr.length - i}
+                          </FieldLegend>
+                          {variant.width && variant.height && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div
+                                  className="border border-border bg-secondary shadow-sm"
+                                  style={{
+                                    aspectRatio: `${variant.width} / ${variant.height}`,
+                                    height: "32px",
+                                  }}
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent side="right">
+                                <span className="font-semibold capitalize">Aspect Ratio</span>
+                                <span className="ml-2 font-medium text-muted-foreground">
+                                  {getAspectRatioString(
+                                    Number(variant.width),
+                                    Number(variant.height),
+                                  )}
+                                </span>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                           {arr.length > 1 && (
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                              className="ml-auto text-destructive hover:bg-destructive/10 hover:text-destructive"
                               onClick={() => field.removeValue(i)}
                             >
                               <Trash2 className="size-4" />
@@ -329,10 +328,10 @@ export function CustomPresetForm({
                           )}
                         </div>
 
-                        <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
+                        <FieldGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
                           <form.AppField name={`variants[${i}].label`}>
                             {(subField) => (
-                              <FormField className="md:col-span-2">
+                              <FormField className="col-span-2 md:col-span-2">
                                 <FormFieldLabel>Label</FormFieldLabel>
                                 <FormFieldControl>
                                   <Input
@@ -417,13 +416,15 @@ export function CustomPresetForm({
                             {(wrapInFolder) => (
                               <form.AppField name={`variants[${i}].filename`}>
                                 {(subField) => (
-                                  <FormField className="md:col-span-2">
-                                    <FormFieldLabel>Filename Base</FormFieldLabel>
-                                    <FormFieldDescription>
-                                      {wrapInFolder
-                                        ? "Folder acts as name. E.g. 'Large' -> 'Bob/Large.png'"
-                                        : "Use {name} token. E.g. '{name}_L' -> 'Bob_L.png'"}
-                                    </FormFieldDescription>
+                                  <FormField className="md:col-span-3">
+                                    <FieldContent>
+                                      <FormFieldLabel>Filename Base</FormFieldLabel>
+                                      <FormFieldDescription>
+                                        {wrapInFolder
+                                          ? "Folder acts as name. E.g. 'Large' -> 'Bob/Large.png'"
+                                          : "Use {name} token. E.g. '{name}_L' -> 'Bob_L.png'"}
+                                      </FormFieldDescription>
+                                    </FieldContent>
                                     <FormFieldControl>
                                       <Input
                                         name={subField.name}

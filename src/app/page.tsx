@@ -1,6 +1,6 @@
+import { PresetGrid } from "@/app/components/PresetGrid";
 import { BackgroundDecorations } from "@/components/layout/BackgroundDecorations";
 import { Panel } from "@/components/ui/Panel";
-import { PresetGrid } from "@/app/components/PresetGrid";
 import { Crop, Gamepad2, ImagePlus } from "lucide-react";
 
 const STEPS = [
@@ -26,7 +26,7 @@ export default function Home() {
     <div className="relative flex flex-1 flex-col overflow-hidden py-12 md:py-24">
       <BackgroundDecorations />
 
-      <div className="relative z-10 container mx-auto max-w-7xl px-4">
+      <div className="relative z-10 container mx-auto max-w-7xl px-12">
         <header className="mb-24 flex flex-col items-center justify-center text-center">
           <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary sm:text-5xl md:text-6xl lg:text-7xl">
             Crop & Quest
@@ -37,24 +37,25 @@ export default function Home() {
           </p>
         </header>
 
-        <section aria-label="How it works" className="mb-24">
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3">
-            {STEPS.map((step, i) => (
-              <Panel
-                key={i}
-                asChild
-                className="items-center bg-card/40 p-8 text-center backdrop-blur supports-backdrop-filter:bg-card/20"
-              >
-                <article>
-                  <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
-                    <step.icon className="size-8" />
-                  </div>
-                  <h3 className="mb-3 font-display text-xl font-bold">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
-                </article>
-              </Panel>
-            ))}
-          </div>
+        <section
+          aria-label="How it works"
+          className="mx-auto mb-24 grid max-w-5xl grid-cols-1 gap-8 lg:grid-cols-3"
+        >
+          {STEPS.map((step, i) => (
+            <Panel
+              key={i}
+              asChild
+              className="items-center bg-card/40 p-8 text-center backdrop-blur supports-backdrop-filter:bg-card/20"
+            >
+              <article>
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
+                  <step.icon className="size-8" />
+                </div>
+                <h3 className="mb-3 font-display text-xl font-bold">{step.title}</h3>
+                <p className="text-muted-foreground">{step.description}</p>
+              </article>
+            </Panel>
+          ))}
         </section>
 
         <section aria-labelledby="preset-selection-heading" className="mb-12">

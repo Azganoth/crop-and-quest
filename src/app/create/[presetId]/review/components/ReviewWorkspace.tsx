@@ -123,8 +123,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           {isPending ? "Starting Over..." : "Start Over"}
         </Button>
       </header>
-      <Separator className="my-3" />
-      <div className="flex flex-wrap items-start justify-center gap-8">
+      <div className="mt-6 flex flex-wrap items-start justify-center gap-8">
         {preset.variants
           .toSorted((a, b) => a.height - b.height)
           .map((variant) => (
@@ -163,7 +162,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           <Panel className="flex flex-col items-center justify-between gap-4 bg-background/95 px-6 py-4 shadow-[0_-4px_24px_rgba(0,0,0,0.1)] backdrop-blur supports-backdrop-filter:bg-background/80 md:flex-row dark:shadow-[0_-4px_24px_rgba(0,0,0,0.3)]">
             <form.AppField name="portraitName">
               {(field) => (
-                <FormField orientation="horizontal" className="w-auto">
+                <FormField orientation="horizontal" className="w-auto gap-4">
                   <FormFieldLabel>Portrait Name</FormFieldLabel>
                   <div className="relative flex flex-col">
                     <FormFieldControl>
@@ -193,9 +192,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           </Panel>
         </Form>
       </form.AppForm>
-
       <Separator className="my-12" />
-
       {preset.installNotes && (
         <Panel className="mx-auto w-full max-w-4xl">
           <h2 className="font-display text-lg font-bold text-foreground">Installation Notes</h2>
@@ -204,7 +201,6 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
           </div>
         </Panel>
       )}
-
       <AlertDialog open={!!error} onOpenChange={(open) => !open && setError(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -24,7 +24,7 @@ export function SiteHeader() {
             Crop & Quest
           </span>
         </Link>
-        <div className="flex items-center space-x-2">
+        <nav aria-label="Utility Links" className="flex items-center space-x-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -63,7 +63,7 @@ export function SiteHeader() {
             </TooltipContent>
           </Tooltip>
           <ThemeToggle />
-        </div>
+        </nav>
       </div>
     </header>
   );

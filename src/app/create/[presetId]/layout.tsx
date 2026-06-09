@@ -20,7 +20,8 @@ export default async function EditorLayout({
         {preset?.cover ? (
           <Image
             src={preset.cover}
-            alt="Background cover"
+            alt=""
+            aria-hidden="true"
             fill
             sizes="100vw"
             className="object-cover opacity-20 mix-blend-overlay blur-sm"

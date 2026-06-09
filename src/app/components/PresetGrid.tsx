@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip
 import { Preset, PRESETS } from "@/data/presets";
 import { useMounted } from "@/hooks/useMounted";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -33,13 +33,15 @@ function PresetCard({
           <Button
             variant="secondary"
             size="icon"
-            className="h-8 w-8 shadow-md hover:bg-secondary/80"
+            className="shadow-md hover:bg-secondary/80"
             asChild
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             aria-label={`Edit ${preset.name}`}
           >
             <Link href={`/custom/${preset.id}/edit`}>
-              <Pencil className="size-4" />
+              <Pencil className="size-5" />
             </Link>
           </Button>
           <ConfirmationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -47,13 +49,13 @@ function PresetCard({
               <Button
                 variant="destructive"
                 size="icon"
-                className="h-8 w-8 shadow-md hover:bg-destructive"
+                className="shadow-md hover:bg-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
                 aria-label={`Delete ${preset.name}`}
               >
-                <Trash2 className="size-4" />
+                <Trash2 className="size-5" />
               </Button>
             </ConfirmationDialogTrigger>
             <ConfirmationDialogContent
@@ -89,9 +91,9 @@ function PresetCard({
             <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-card transition-all duration-700 group-hover:brightness-50" />
           )}
           <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
-            <h3 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
+            <h4 className="font-display text-2xl font-bold tracking-wide text-white drop-shadow-lg transition-transform duration-500 group-hover:scale-105">
               {preset.name}
-            </h3>
+            </h4>
           </div>
         </div>
 
@@ -136,29 +138,26 @@ export function PresetGrid() {
 
   return (
     <div className="flex flex-col gap-12">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-8 lg:grid-cols-3 xl:grid-cols-4">
         {PRESETS.map((preset) => (
           <PresetCard key={preset.id} preset={preset} />
         ))}
       </div>
 
       <section>
-        <h2 className="mb-6 font-display text-2xl font-bold">Custom Presets</h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <h3 className="mb-6 text-center font-display text-2xl font-bold">Custom Presets</h3>
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
           <article className="relative aspect-video w-full">
             <Link
               href="/custom/new"
               className="group absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-primary/40 bg-card/50 shadow-sm transition-all duration-500 hover:z-20 hover:border-primary hover:bg-card hover:shadow-xl"
             >
               <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
-                <Plus className="size-6" />
+                <Plus className="size-8" />
               </div>
-              <h3 className="mt-2 font-display text-xl font-bold tracking-wide text-primary">
+              <h4 className="mt-4 font-display text-xl font-bold tracking-wide text-primary">
                 Custom Preset
-              </h3>
-              <p className="mt-1 px-4 text-center text-sm text-muted-foreground">
-                Define dimensions for any game or mod.
-              </p>
+              </h4>
             </Link>
           </article>
 
