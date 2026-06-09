@@ -27,6 +27,7 @@ import { Switch } from "@/components/ui/Switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { Preset, type PortraitExportFormat } from "@/data/presets";
 import { getAspectRatioString } from "@/lib/math";
+import { ROUTES } from "@/lib/routes";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
 import { Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -159,10 +160,10 @@ export function CustomPresetForm({
 
       if (isEditMode && initialData) {
         updateCustomPreset(presetId, newPreset);
-        router.push("/");
+        router.push(ROUTES.home);
       } else {
         addCustomPreset(newPreset);
-        router.push(`/create/${presetId}/select`);
+        router.push(ROUTES.create.select(presetId));
       }
     },
   });
@@ -462,7 +463,7 @@ export function CustomPresetForm({
 
           <div className="flex justify-end gap-4">
             <Button type="button" variant="ghost" size="lg" asChild>
-              <Link href="/">Cancel</Link>
+              <Link href={ROUTES.home}>Cancel</Link>
             </Button>
             <FormSubmitButton size="lg">
               {mode === "create" ? "Save and Continue" : "Save Changes"}

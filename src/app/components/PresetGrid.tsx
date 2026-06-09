@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/ConfirmationDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { Preset, PRESETS } from "@/data/presets";
+import { ROUTES } from "@/lib/routes";
 import { useMounted } from "@/hooks/useMounted";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -40,8 +41,8 @@ function PresetCard({
             }}
             aria-label={`Edit ${preset.name}`}
           >
-            <Link href={`/custom/${preset.id}/edit`}>
-              <Pencil className="size-5" />
+            <Link href={ROUTES.custom.edit(preset.id)}>
+              <Pencil className="size-4" />
             </Link>
           </Button>
           <ConfirmationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -74,7 +75,7 @@ function PresetCard({
         </div>
       )}
       <Link
-        href={`/create/${preset.id}/select`}
+        href={ROUTES.create.select(preset.id)}
         className="absolute top-0 left-0 z-10 flex w-full flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-500 hover:z-20 hover:border-primary/50 hover:shadow-xl"
       >
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
@@ -149,7 +150,7 @@ export function PresetGrid() {
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:gap-8 lg:grid-cols-4">
           <article className="relative aspect-video w-full">
             <Link
-              href="/custom/new"
+              href={ROUTES.custom.new}
               className="group absolute top-0 left-0 z-10 flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-primary/40 bg-card/50 shadow-sm transition-all duration-500 hover:z-20 hover:border-primary hover:bg-card hover:shadow-xl"
             >
               <div className="flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">

@@ -2,6 +2,7 @@
 
 import { CropperWorkspace } from "@/app/create/[presetId]/[variant]/components/CropperWorkspace";
 import { usePresetResolver } from "@/hooks/usePresetResolver";
+import { ROUTES } from "@/lib/routes";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useRouter } from "next/navigation";
 import { use, useEffect } from "react";
@@ -27,11 +28,11 @@ export default function CropVariantPage({
 
   useEffect(() => {
     if (!isLoading && !preset) {
-      router.replace("/");
+      router.replace(ROUTES.home);
     } else if (preset && !variant) {
-      router.replace(`/create/${preset.id}/select`);
+      router.replace(ROUTES.create.select(preset.id));
     } else if (!imageUrl) {
-      router.replace(`/create/${presetId}/select`);
+      router.replace(ROUTES.create.select(presetId));
     }
   }, [preset, isLoading, variant, imageUrl, router, presetId]);
 

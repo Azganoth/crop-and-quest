@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import type { PortraitVariant } from "@/data/presets";
 import { cn } from "@/lib/cn";
+import { ROUTES } from "@/lib/routes";
 import { Download, Edit2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -76,7 +77,7 @@ export function PortraitPreviewCard({
           <div className="flex flex-col items-center justify-center p-6 text-muted-foreground">
             <span className="font-semibold">Skipped</span>
             <Button variant="secondary" size="lg" className="mt-6" asChild>
-              <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
+              <Link href={ROUTES.create.crop(presetId, variant.key, { singleEdit: true })}>
                 <Edit2 className="mr-1 size-5" />
                 Crop Variant
               </Link>
@@ -96,7 +97,7 @@ export function PortraitPreviewCard({
         {cropUrl && (
           <div className="mt-1 flex gap-3">
             <Button variant="outline" asChild>
-              <Link href={`/create/${presetId}/${variant.key}?singleEdit=true`}>
+              <Link href={ROUTES.create.crop(presetId, variant.key, { singleEdit: true })}>
                 <Edit2 className="mr-1 size-5 shrink-0" />
                 <span className="truncate">Edit</span>
               </Link>

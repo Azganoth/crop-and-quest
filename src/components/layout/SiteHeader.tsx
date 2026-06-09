@@ -4,6 +4,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
 import { Crop } from "lucide-react";
+import { ROUTES } from "@/lib/routes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -15,7 +16,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="container mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
         <Link
-          href="/"
+          href={ROUTES.home}
           className="flex items-center space-x-2 text-primary transition-colors hover:text-primary/80"
           title="Crop & Quest Home"
         >

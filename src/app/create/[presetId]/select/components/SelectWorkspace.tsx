@@ -3,6 +3,7 @@
 import { Panel } from "@/components/ui/Panel";
 import { Preset } from "@/data/presets";
 import { usePortraitStore } from "@/store/usePortraitStore";
+import { ROUTES } from "@/lib/routes";
 import { Image as ImageIcon, ImagePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -58,7 +59,7 @@ export function SelectWorkspace({ preset }: SelectWorkspaceProps) {
 
     if (preset.variants.length > 0) {
       const firstVariant = preset.variants[0].key;
-      router.push(`/create/${preset.id}/${firstVariant}`);
+      router.push(ROUTES.create.crop(preset.id, firstVariant));
     }
   };
 

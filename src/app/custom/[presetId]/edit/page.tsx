@@ -2,6 +2,7 @@
 
 import { CustomPresetForm } from "@/app/custom/components/CustomPresetForm";
 import { useCustomPresetsStore } from "@/store/useCustomPresetsStore";
+import { ROUTES } from "@/lib/routes";
 import { useRouter } from "next/navigation";
 import { use, useEffect } from "react";
 
@@ -18,7 +19,7 @@ export default function EditCustomPresetPage({
 
   useEffect(() => {
     if (!preset) {
-      router.replace("/");
+      router.replace(ROUTES.home);
     }
   }, [preset, router]);
 

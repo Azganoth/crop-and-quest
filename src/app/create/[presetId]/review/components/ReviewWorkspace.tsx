@@ -30,6 +30,7 @@ import { useMounted } from "@/hooks/useMounted";
 import { generatePresetZip, resolveVariantFilename, triggerDownload } from "@/lib/export";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { ROUTES } from "@/lib/routes";
 import { FileArchive, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
@@ -100,7 +101,7 @@ export function ReviewWorkspace({ preset }: { preset: Preset }) {
   const handleStartOver = () => {
     startTransition(() => {
       clearSession();
-      router.push(`/create/${preset.id}/select`);
+      router.push(ROUTES.create.select(preset.id));
     });
   };
 

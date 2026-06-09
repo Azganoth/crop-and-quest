@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/Separator";
 import type { PortraitVariant, Preset } from "@/data/presets";
 import { exportCroppedImage } from "@/lib/canvas";
 import { usePortraitStore } from "@/store/usePortraitStore";
+import { ROUTES } from "@/lib/routes";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -109,11 +110,11 @@ export function CropperWorkspace({
 
       startTransition(() => {
         if (isSingleEdit) {
-          router.push(`/create/${preset.id}/review`);
+          router.push(ROUTES.create.review(preset.id));
         } else if (nextVariant) {
-          router.push(`/create/${preset.id}/${nextVariant.key}`);
+          router.push(ROUTES.create.crop(preset.id, nextVariant.key));
         } else {
-          router.push(`/create/${preset.id}/review`);
+          router.push(ROUTES.create.review(preset.id));
         }
       });
     } catch (e) {
@@ -127,11 +128,11 @@ export function CropperWorkspace({
   const handleSkip = () => {
     startTransition(() => {
       if (isSingleEdit) {
-        router.push(`/create/${preset.id}/review`);
+        router.push(ROUTES.create.review(preset.id));
       } else if (nextVariant) {
-        router.push(`/create/${preset.id}/${nextVariant.key}`);
+        router.push(ROUTES.create.crop(preset.id, nextVariant.key));
       } else {
-        router.push(`/create/${preset.id}/review`);
+        router.push(ROUTES.create.review(preset.id));
       }
     });
   };
@@ -139,10 +140,10 @@ export function CropperWorkspace({
   const aspect = variant.width / variant.height;
   const previousVariant = variantIndex > 0 ? preset.variants[variantIndex - 1] : undefined;
   const backHref = isSingleEdit
-    ? `/create/${preset.id}/review`
+    ? ROUTES.create.review(preset.id)
     : previousVariant
-      ? `/create/${preset.id}/${previousVariant.key}`
-      : `/create/${preset.id}/select`;
+      ? ROUTES.create.crop(preset.id, previousVariant.key)
+      : ROUTES.create.select(preset.id);
 
   return (
     <section

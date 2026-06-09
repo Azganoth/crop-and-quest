@@ -1,11 +1,12 @@
 "use client";
 
+import { ROUTES } from "@/lib/routes";
 import { usePathname } from "next/navigation";
 
 export function SiteFooter() {
   const pathname = usePathname();
 
-  if (pathname.startsWith("/create") || pathname.startsWith("/custom")) {
+  if (pathname.startsWith(ROUTES.create._base) || pathname.startsWith(ROUTES.custom._base)) {
     return null;
   }
 

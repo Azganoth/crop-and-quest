@@ -2,6 +2,7 @@
 
 import { SelectWorkspace } from "@/app/create/[presetId]/select/components/SelectWorkspace";
 import { usePresetResolver } from "@/hooks/usePresetResolver";
+import { ROUTES } from "@/lib/routes";
 import { useRouter } from "next/navigation";
 import { use, useEffect } from "react";
 
@@ -12,7 +13,7 @@ export default function SelectPage({ params }: { params: Promise<{ presetId: str
 
   useEffect(() => {
     if (!isLoading && !preset) {
-      router.replace("/");
+      router.replace(ROUTES.home);
     }
   }, [preset, isLoading, router]);
 

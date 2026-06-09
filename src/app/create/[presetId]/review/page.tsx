@@ -2,6 +2,7 @@
 
 import { ReviewWorkspace } from "@/app/create/[presetId]/review/components/ReviewWorkspace";
 import { usePresetResolver } from "@/hooks/usePresetResolver";
+import { ROUTES } from "@/lib/routes";
 import { usePortraitStore } from "@/store/usePortraitStore";
 import { useRouter } from "next/navigation";
 import { use, useEffect } from "react";
@@ -14,9 +15,9 @@ export default function ReviewPage({ params }: { params: Promise<{ presetId: str
 
   useEffect(() => {
     if (!isLoading && !preset) {
-      router.replace("/");
+      router.replace(ROUTES.home);
     } else if (preset && !imageUrl) {
-      router.replace(`/create/${presetId}/select`);
+      router.replace(ROUTES.create.select(presetId));
     }
   }, [preset, isLoading, imageUrl, router, presetId]);
 
