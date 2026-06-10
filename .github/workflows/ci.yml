@@ -33,8 +33,11 @@ jobs:
       - name: Format check
         run: pnpm fmt:check
 
-      - name: Lint and Typecheck
-        run: pnpm check
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
 
   test-unit:
     name: Unit Tests
@@ -60,6 +63,7 @@ jobs:
         run: pnpm test
 
   test-e2e:
+    name: End-to-End Tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
