@@ -9,7 +9,7 @@
     "test": "vitest run",
     "lint": "oxlint",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm run lint && pnpm run typecheck",
+    "check": "pnpm run fmt:check && pnpm run typecheck && pnpm run lint && pnpm run test",
     "fmt": "oxfmt .",
     "fmt:check": "oxfmt --check"
   },
