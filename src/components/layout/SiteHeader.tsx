@@ -3,9 +3,10 @@
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/Tooltip";
-import { Crop } from "lucide-react";
 import { ROUTES } from "@/lib/routes";
+import Image from "next/image";
 import Link from "next/link";
+import appIcon from "@/app/icon.svg";
 import { usePathname } from "next/navigation";
 
 export function SiteHeader() {
@@ -20,7 +21,7 @@ export function SiteHeader() {
           className="flex items-center space-x-2 text-primary transition-colors hover:text-primary/80"
           title="Crop & Quest Home"
         >
-          <Crop className="h-8 w-8" />
+          <Image src={appIcon} alt="Crop & Quest" className="size-6" />
           <span className={isHome ? "sr-only" : "hidden text-xl font-bold sm:inline-block"}>
             Crop & Quest
           </span>
