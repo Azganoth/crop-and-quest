@@ -7,17 +7,20 @@ const STEPS = [
   {
     icon: Gamepad2,
     title: "1. Choose a Preset",
-    description: "Select your RPG to automatically load the exact portrait dimensions needed.",
+    description:
+      "Select a built-in preset for your favorite RPG, or create a custom format with exact dimensions.",
   },
   {
     icon: ImagePlus,
-    title: "2. Import Artwork",
-    description: "Load your character art. Everything is processed locally in your browser.",
+    title: "2. Load Your Artwork",
+    description:
+      "Import your character's art. Processing happens entirely on your device, so your images stay perfectly private.",
   },
   {
     icon: Crop,
-    title: "3. Crop & Export",
-    description: "Frame your portraits and instantly download a ready-to-extract ZIP pack.",
+    title: "3. Crop & Quest",
+    description:
+      "Perfectly frame your portraits and instantly download a ready-to-drop ZIP pack for your game folder.",
   },
 ];
 
@@ -32,8 +35,8 @@ export default function Home() {
             Crop & Quest
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            A local-first portrait preparation tool for RPGs and CRPGs. Prepare your character
-            portraits with precision, completely in your browser.
+            Bring your characters to life. Instantly crop, resize, and export game-ready portraits
+            for your favorite CRPGs.
           </p>
         </header>
 
